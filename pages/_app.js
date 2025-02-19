@@ -1,7 +1,7 @@
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import { ThemeProvider } from '@mui/material/styles';
-import darkTheme from './theme';
+import darkTheme from '../theme/theme';
 import '../styles/globals.css';
 
 function MyApp({ Component, pageProps }) {
