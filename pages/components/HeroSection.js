@@ -17,14 +17,14 @@ const HeroSection = () => {
                 <div className="relative w-64 h-64 mb-8 overflow-hidden">
                     <img
                         src="/pp-nobg.png" // Replace with your image path
-                        alt="Your Name"
+                        alt="Kentuckyfb"
                         className="w-full h-full object-cover"
                     />
                 </div>
 
                 {/* Text */}
                 <h1 className="text-5xl font-poppins font-bold text-white mb-4">
-                    Hello, I’m [Your Name]
+                    Hello, I’m [KentuckyFB]
                 </h1>
                 <p className="text-xl text-gray-300 font-poppins mb-8">
                     I’m a developer passionate about building cool stuff. Let’s create something amazing together!

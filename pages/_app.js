@@ -12,9 +12,9 @@ function MyApp({ Component, pageProps }) {
       `}</style>
 
     <ThemeProvider theme={darkTheme}>
-      <Navbar />
+      
       <Component {...pageProps} />
-      <Footer />
+      
     </ThemeProvider>
     </>
   );

@@ -27,32 +27,42 @@ const WorkTechSection = () => {
           <div className="flex justify-end space-x-4 mb-8">
             <button
               onClick={() => setView('work')}
-              className={`px-6 py-2 rounded-lg font-poppins font-semibold transition-all ${
-                view === 'work'
+              className={`px-6 py-2 rounded-lg font-poppins font-semibold transition-all ${view === 'work'
                   ? 'bg-dark-orange text-white'
                   : 'bg-dark-gray text-gray-300 hover:bg-dark-orange hover:text-white'
-              }`}
+                }`}
             >
               Work History
             </button>
             <button
               onClick={() => setView('tech')}
-              className={`px-6 py-2 rounded-lg font-poppins font-semibold transition-all ${
-                view === 'tech'
+              className={`px-6 py-2 rounded-lg font-poppins font-semibold transition-all ${view === 'tech'
                   ? 'bg-dark-orange text-white'
                   : 'bg-dark-gray text-gray-300 hover:bg-dark-orange hover:text-white'
-              }`}
+                }`}
             >
               Tech Stack
+            </button>
+
+            <button
+              onClick={() => setView('Education')}
+              className={`px-6 py-2 rounded-lg font-poppins font-semibold transition-all ${view === 'Education'
+                  ? 'bg-dark-orange text-white'
+                  : 'bg-dark-gray text-gray-300 hover:bg-dark-orange hover:text-white'
+                }`}
+            >
+              Education
             </button>
           </div>
 
           {/* Content */}
           {view === 'work' ? (
             <WorkHistory />
-          ) : (
+          ) : view === 'tech' ? (
             <TechStack />
-          )}
+          ) : view === 'Education' ? ( // Added this line
+            <Education />
+          ) : null} 
         </motion.div>
       </div>
     </section>
@@ -60,80 +70,80 @@ const WorkTechSection = () => {
 };
 
 const WorkHistory = () => {
-    const fadeInUp = {
-        hidden: { opacity: 0, y: 50 },
-        visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
-      };
-      
-    const workData = [
-      {
-        title: 'Frontend Developer',
-        description: 'Worked on building responsive and user-friendly web applications using React and Next.js.',
-        timeline: '2021 - Present',
-      },
-      {
-        title: 'Backend Developer',
-        description: 'Developed REST APIs and managed databases using Python and SQL.',
-        timeline: '2019 - 2021',
-      },
-      {
-        title: 'Freelance Developer',
-        description: 'Collaborated with clients to deliver custom web solutions.',
-        timeline: '2017 - 2019',
-      },
-    ];
-  
-    return (
-      <div className="space-y-8">
-        {workData.map((work, index) => (
-          <motion.div
-            key={index}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={fadeInUp}
-            className="flex"
-          >
-            {/* Timeline Marker */}
-            <div className="relative w-12 flex-shrink-0">
-              <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-dark-orange rounded-full"></div>
-              {index !== workData.length - 1 && (
-                <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-1 h-full bg-dark-orange"></div>
-              )}
-            </div>
-  
-            {/* Work Details */}
-            <div className="flex-1 ml-4">
-              <h3 className="text-2xl font-poppins font-bold text-white">{work.title}</h3>
-              <p className="text-gray-300 font-poppins">{work.description}</p>
-              <p className="text-gray-400 font-poppins mt-2">{work.timeline}</p>
-            </div>
-          </motion.div>
-        ))}
-  
-        {/* Download CV Button */}
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  };
+
+  const workData = [
+    {
+      title: 'Atlas Axillia - Digital & Martech Executive',
+      description: 'Managed CRM, website revamp, app development, and AI solutions. Used Google Analytics, Zoho CRM, MySQL, Postman.',
+      timeline: 'July 2024 - Present', // You'll need to fill in the actual dates here
+    },
+    {
+      title: 'Ninehermits - Game Developer',
+      description: 'Developed 2D/3D web games with Unity and JavaScript. Assisted with blockchain NFT game and multiplayer mechanics.',
+      timeline: 'Jan 2023 – Jul 2023', // You'll need to fill in the actual dates here
+    },
+    {
+      title: 'GIGA FOODS - IT Operations & Front Office',
+      description: 'Managed customer support, order logs, system updates, and sales reporting.',
+      timeline: 'Jan 2022 – Dec 2022', // You'll need to fill in the actual dates here
+    },
+  ];
+
+  return (
+    <div className="space-y-8">
+      {workData.map((work, index) => (
         <motion.div
+          key={index}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeInUp}
-          className="flex justify-center mt-8"
+          className="flex"
         >
-          <a
-            href="/path-to-your-cv.pdf" // Replace with the path to your CV
-            download="YourName_CV.pdf" // Replace with your desired file name
-            className="px-8 py-3 bg-dark-orange text-white font-poppins font-semibold rounded-lg hover:bg-opacity-90 hover:shadow-lg hover:shadow-dark-orange/50 transition-all"
-          >
-            Download CV
-          </a>
+          {/* Timeline Marker */}
+          <div className="relative w-12 flex-shrink-0">
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-dark-orange rounded-full"></div>
+            {index !== workData.length - 1 && (
+              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-1 h-full bg-dark-orange"></div>
+            )}
+          </div>
+
+          {/* Work Details */}
+          <div className="flex-1 ml-4">
+            <h3 className="text-2xl font-poppins font-bold text-white">{work.title}</h3>
+            <p className="text-gray-300 font-poppins">{work.description}</p>
+            <p className="text-gray-400 font-poppins mt-2">{work.timeline}</p>
+          </div>
         </motion.div>
-      </div>
-    );
-  };
+      ))}
+
+      {/* Download CV Button */}
+      <motion.div
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true }}
+        variants={fadeInUp}
+        className="flex justify-center mt-8"
+      >
+        <a
+          href="/CV - Nathan Himesh.pdf" // Replace with the path to your CV
+          download="CV - Nathan Himesh" // Replace with your desired file name
+          className="px-8 py-3 bg-dark-orange text-white font-poppins font-semibold rounded-lg hover:bg-opacity-90 hover:shadow-lg hover:shadow-dark-orange/50 transition-all"
+        >
+          Download CV
+        </a>
+      </motion.div>
+    </div>
+  );
+};
 
 // Tech Stack Component
 const TechStack = () => {
-    // Animation variants
+  // Animation variants
   const fadeInUp = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -163,6 +173,67 @@ const TechStack = () => {
         >
           <div className="text-dark-orange">{tech.icon}</div>
           <p className="text-white font-poppins mt-2">{tech.name}</p>
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+
+const Education = () => {
+  const fadeInUp = {
+    hidden: { opacity: 0, y: 50 },
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+  };
+
+  const educationData = [
+    {
+      title: 'BSc (Hons) Software Engineering (Second Class Honours)',
+      institution: 'Universal College Lanka (UCL) - UCLAN',
+      timeline: 'July 2024',
+    },
+    {
+      title: 'Foundations Diploma for Higher Education Studies (Software Engineering)',
+      institution: 'UCL - NCC Education',
+      timeline: 'Jan 2022',
+    },
+    {
+      title: 'Diploma in Hotel Management',
+      institution: 'Swiss Lanka Hotel School',
+      timeline: 'Jan 2021',
+    },
+    {
+      title: 'Ordinary Level Examinations',
+      institution: 'Wesley College, Borella',
+      timeline: 'Jan 2019',
+    },
+  ];
+
+  return (
+    <div className="space-y-8">
+      {educationData.map((edu, index) => (
+        <motion.div
+          key={index}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={fadeInUp}
+          className="flex"
+        >
+          {/* Timeline Marker (same as WorkHistory) */}
+          <div className="relative w-12 flex-shrink-0">
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-dark-orange rounded-full"></div>
+            {index !== educationData.length - 1 && (
+              <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-1 h-full bg-dark-orange"></div>
+            )}
+          </div>
+
+          {/* Education Details */}
+          <div className="flex-1 ml-4">
+            <h3 className="text-2xl font-poppins font-bold text-white">{edu.title}</h3>
+            <p className="text-gray-300 font-poppins">{edu.institution}</p>
+            <p className="text-gray-400 font-poppins mt-2">{edu.timeline}</p>
+          </div>
         </motion.div>
       ))}
     </div>

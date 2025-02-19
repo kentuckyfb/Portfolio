@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { GitHub, LinkedIn, Twitter, Email, Phone } from '@mui/icons-material'; // Social media icons
 import Image from 'next/image';
 
-const Footer = () => {
+const Footer = ({ scrollToSection, refs }) => {
   return (
     <footer className="bg-black bg-opacity-80 backdrop-blur-md border-t border-gray-800 rounded-t-3xl mt-16 py-12 mx-auto max-w-8xl w-11/12">
       <div className="container mx-auto px-6 flex flex-col lg:flex-row justify-between items-start space-y-8 lg:space-y-0">
@@ -11,13 +11,13 @@ const Footer = () => {
           <div className="relative w-24 h-24 rounded-full overflow-hidden">
             <Image
               src="/pp.jpg" // Replace with your image path
-              alt="Your Name"
+              alt="Kentucky"
               layout="fill"
               objectFit="cover"
             />
           </div>
           <p className="text-gray-300 text-center lg:text-left font-poppins">
-            Hi, I’m [Your Name].<br></br> I’m a developer passionate about building cool stuff.
+            Hi, I’m [Kentuckyfb].<br></br> I’m a developer passionate about building cool stuff.
           </p>
         </div>
 
@@ -26,24 +26,24 @@ const Footer = () => {
           <h3 className="text-white font-poppins font-semibold text-lg">Navigation</h3>
           <ul className="space-y-2">
             <li>
-              <Link href="/" className="text-gray-300 hover:text-white transition-colors font-poppins">
+              <div onClick={() => scrollToSection(refs.homeRef)} className="text-gray-300 hover:text-white transition-colors font-poppins">
                 Home
-              </Link>
+              </div>
             </li>
             <li>
-              <Link href="/about" className="text-gray-300 hover:text-white transition-colors font-poppins">
+              <div onClick={() => scrollToSection(refs.aboutRef)} className="text-gray-300 hover:text-white transition-colors font-poppins">
                 About
-              </Link>
+              </div>
             </li>
             <li>
-              <Link href="/projects" className="text-gray-300 hover:text-white transition-colors font-poppins">
-                Projects
-              </Link>
+              <div onClick={() => scrollToSection(refs.workRef)} className="text-gray-300 hover:text-white transition-colors font-poppins">
+                Work
+              </div>
             </li>
             <li>
-              <Link href="/contact" className="text-gray-300 hover:text-white transition-colors font-poppins">
+              <div onClick={() => scrollToSection(refs.contactRef)} className="text-gray-300 hover:text-white transition-colors font-poppins">
                 Contact
-              </Link>
+              </div>
             </li>
           </ul>
         </div>
@@ -74,7 +74,7 @@ const Footer = () => {
           <h3 className="text-white font-poppins font-semibold text-lg">Follow Me</h3>
           <div className="flex space-x-4">
             <a
-              href="https://github.com/yourusername"
+              href="https://github.com/kentuckyfb"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center w-10 h-10 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors"
@@ -82,26 +82,12 @@ const Footer = () => {
               <GitHub className="text-white" />
             </a>
             <a
-              href="https://linkedin.com/in/yourusername"
+              href="https://www.linkedin.com/in/nathan-himesh-652171250/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center w-10 h-10 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors"
             >
               <LinkedIn className="text-white" />
-            </a>
-            <a
-              href="https://twitter.com/yourusername"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center justify-center w-10 h-10 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors"
-            >
-              <Twitter className="text-white" />
-            </a>
-            <a
-              href="mailto:codewithshabbir07@gmail.com"
-              className="flex items-center justify-center w-10 h-10 bg-gray-700 rounded-full hover:bg-gray-600 transition-colors"
-            >
-              <Email className="text-white" />
             </a>
           </div>
         </div>
@@ -110,7 +96,7 @@ const Footer = () => {
       {/* Copyright Section */}
       <div className="border-t border-gray-800 mt-8 pt-6 text-center">
         <p className="text-gray-400 font-poppins">
-          &copy; {new Date().getFullYear()} [Your Name]. All rights reserved.
+          &copy; {new Date().getFullYear()} [KentuckyFb]. All rights reserved.
         </p>
       </div>
     </footer>

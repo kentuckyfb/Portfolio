@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { Home, Info, ContactMail, Work, RadarRounded } from '@mui/icons-material'; // Import icons
 
-const Navbar = () => {
+const Navbar = ({ scrollToSection, refs }) =>  {
   return (
     <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-80 backdrop-blur-md shadow-lg rounded-full z-50 border border-gray-800 w-11/12 max-w-4xl">
       <div className="container mx-auto flex justify-between items-center p-3">
@@ -13,29 +13,29 @@ const Navbar = () => {
         {/* Navigation items on the right, pushed towards the middle */}
         <ul className="flex space-x-8">
           <li>
-            <Link href="/" className="flex items-center text-gray-300 hover:text-white transition-colors font-poppins">
+            <div onClick={() => scrollToSection(refs.homeRef)} className="flex items-center text-gray-300 hover:text-white transition-colors font-poppins">
               <Home className="mr-2" /> Home
-            </Link>
+            </div>
           </li>
           <li>
-            <Link href="/about" className="flex items-center text-gray-300 hover:text-white transition-colors font-poppins">
+            <div onClick={() => scrollToSection(refs.aboutRef)} className="flex items-center text-gray-300 hover:text-white transition-colors font-poppins">
               <Info className="mr-2" /> About
-            </Link>
+            </div>
           </li>
           <li>
-            <Link href="/projects" className="flex items-center text-gray-300 hover:text-white transition-colors font-poppins">
-              <Work className="mr-2" /> Projects
-            </Link>
+            <div onClick={() => scrollToSection(refs.workRef)} className="flex items-center text-gray-300 hover:text-white transition-colors font-poppins">
+              <Work className="mr-2" /> Work
+            </div>
           </li>
           <li>
-            <Link href="/contact" className="flex items-center text-gray-300 hover:text-white transition-colors font-poppins">
+            <div onClick={() => scrollToSection(refs.workRef)} className="flex items-center text-gray-300 hover:text-white transition-colors font-poppins">
               <RadarRounded className="mr-2" /> Skills
-            </Link>
+            </div>
           </li>
           <li>
-            <Link href="/contact" className="flex items-center text-gray-300 hover:text-white transition-colors font-poppins">
+            <div onClick={() => scrollToSection(refs.contactRef)} className="flex items-center text-gray-300 hover:text-white transition-colors font-poppins">
               <ContactMail className="mr-2" /> Contact
-            </Link>
+            </div>
           </li>
         </ul>
       </div>
