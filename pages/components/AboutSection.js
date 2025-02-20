@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { X } from "lucide-react"; // For close button icon
+import { X } from "lucide-react";
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 
 const projects = [
     {
@@ -38,24 +40,33 @@ const AboutSection = () => {
         visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeInOut" } },
     };
 
+    const settings = {
+        dots: true,
+        infinite: true,
+        speed: 500,
+        slidesToShow: 1,
+        slidesToScroll: 1,
+        arrows: false,
+    };
+
     return (
-        <section className="h-screen w-full flex items-center justify-center bg-dark-black py-16 px-8 lg:px-16">
-            <div className="container mx-auto max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-12">
+        <section className=" w-full flex items-center justify-center bg-dark-black py-16 px-8 lg:px-16 ">
+            <div className="container mx-auto max-w-5xl flex flex-col lg:flex-row items-center justify-center gap-12 ">
                 {/* Profile Card */}
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={fadeInUp}
-                    className="w-full lg:w-auto max-w-sm h-[50vh] bg-dark-gray bg-opacity-50 backdrop-blur-md rounded-2xl p-6 border border-gray-800 shadow-lg"
+                    className="w-full lg:w-auto max-w-sm lg:max-w-md max-h-[30rem] lg:max-h-[40rem] bg-dark-gray bg-opacity-50 backdrop-blur-md rounded-2xl p-6 lg:p-4 border border-gray-800 shadow-lg"
                 >
-                    <div className="flex flex-col items-center space-y-6">
-                        <div className="relative w-32 h-32 rounded-lg overflow-hidden">
+                    <div className="flex flex-col items-center space-y-6 lg:space-y-3">
+                        <div className="relative w-32 h-32 lg:w-40 lg:h-40 rounded-lg overflow-hidden">
                             <Image src="/pp.jpg" alt="Your Name" layout="fill" objectFit="cover" />
                         </div>
                         <div className="text-center">
-                            <h3 className="text-2xl font-poppins font-bold text-white mb-4">Personal Details</h3>
-                            <ul className="space-y-2 text-gray-300 font-poppins w-full">
+                            <h3 className="text-lg sm:text-xl md:text-2xl lg:text-2xl font-poppins font-bold text-white mb-4">Personal Details</h3>
+                            <ul className="space-y-2 text-gray-300 font-poppins w-full text-sm sm:text-base md:text-1xl ">
                                 <li className="flex justify-between"><span><strong>Age:</strong></span><span>22</span></li>
                                 <li className="flex justify-between"><span><strong>Birthday:</strong></span><span>January 2, 2003</span></li>
                                 <li className="flex justify-between"><span><strong>Country:</strong></span><span>Sri Lanka</span></li>
@@ -67,11 +78,8 @@ const AboutSection = () => {
 
                 {/* Projects Section */}
                 <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="w-full lg:w-auto space-y-8">
-
-                    <h2 className="text-7xl font-poppins font-bold text-white text-center lg:text-left">Recent <br /> Projects</h2>
-
-                    <div className="space-y-6 ">
-
+                    <h2 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl 2xl:text-7xl font-poppins font-bold text-white text-center lg:text-left">Recent <br /> Projects</h2>
+                    <div className="space-y-2 ">
                         {projects.map((project) => (
                             <motion.div
                                 key={project.id}
@@ -79,16 +87,16 @@ const AboutSection = () => {
                                 whileInView="visible"
                                 viewport={{ once: true }}
                                 variants={fadeInUp}
-                                className="bg-dark-gray bg-opacity-50 backdrop-blur-md rounded-2xl p-6 border border-gray-800 shadow-lg cursor-pointer transition-transform duration-300 hover:scale-105"
+                                className="bg-dark-gray bg-opacity-50 backdrop-blur-md rounded-2xl p-6 border border-gray-800 shadow-lg cursor-pointer transition-transform duration-300 hover:scale-105 max-w-md lg:max-w-lg lg:max-h-[30rem] xl:max-w-xl xl:max-h-[36rem]"
                                 onClick={() => setSelectedProject(project)}
                             >
                                 <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-6 transition-transform duration-300 hover:scale-105">
-                                    <div className="relative w-full lg:w-32 h-32 rounded-lg overflow-hidden ">
+                                    <div className="relative w-24 h-24 lg:w-32 lg:h-32 rounded-lg overflow-hidden ">
                                         <Image src={`/project${project.id}.png`} alt={`Project ${project.id}`} layout="fill" objectFit="cover" />
                                     </div>
                                     <div className="flex-1">
-                                        <h3 className="text-2xl font-poppins font-bold text-white mb-2"> {project.title}</h3>
-                                        <p className="text-gray-300 font-poppins">
+                                        <h3 className="text-xl md:text-2xl lg:text-lg font-poppins font-bold text-white mb-2"> {project.title}</h3>
+                                        <p className="text-sm md:text-base lg:text-sm text-gray-300 font-poppins">
                                             {project.description}
                                         </p>
                                     </div>

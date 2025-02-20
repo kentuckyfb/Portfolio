@@ -2,6 +2,14 @@ import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { FaReact, FaPython, FaDatabase, FaNodeJs, FaHtml5, FaCss3 } from 'react-icons/fa';
 import { SiNextdotjs, SiJavascript, SiTypescript } from 'react-icons/si';
+import {
+  FaBriefcase,
+  FaCode,
+  FaGraduationCap,
+  FaLaptopCode,
+  FaTools,
+  FaSchool,
+} from 'react-icons/fa';
 
 const WorkTechSection = () => {
   const [view, setView] = useState('work'); // 'work' or 'tech'
@@ -11,50 +19,55 @@ const WorkTechSection = () => {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
   };
+  const variants = {
+    hidden: { opacity: 0, x: -50 },
+    visible: { opacity: 1, x: 0 },
+  };
 
   return (
-    <section className="h-screen w-full flex items-center justify-center bg-dark-black py-16 px-8 lg:px-16">
-      <div className="container mx-auto max-w-6xl">
+    <section className=" w-full flex items-center justify-center bg-dark-black py-16 px-8 lg:px-16">
+      <div className="container mx-auto max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-6xl">
         {/* Glassmorphism Box */}
         <motion.div
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
           variants={fadeInUp}
-          className="bg-dark-gray bg-opacity-50 backdrop-blur-md rounded-2xl p-8 border border-gray-800 shadow-lg"
+          className="bg-dark-gray bg-opacity-50 backdrop-blur-md rounded-2xl p-4 border border-gray-800 shadow-lg"
         >
           {/* Toggle Buttons */}
-          <div className="flex justify-end space-x-4 mb-8">
+          <div className="flex justify-end space-x-2 mb-6 sm:mb-8">
             <button
               onClick={() => setView('work')}
-              className={`px-6 py-2 rounded-lg font-poppins font-semibold transition-all ${view === 'work'
-                  ? 'bg-dark-orange text-white'
-                  : 'bg-dark-gray text-gray-300 hover:bg-dark-orange hover:text-white'
+              className={`p-2 sm:px-6 sm:py-2 rounded-lg transition-all ${view === 'work'
+                ? 'bg-dark-orange text-white'
+                : 'bg-dark-gray text-gray-300 hover:bg-dark-orange hover:text-white'
                 }`}
             >
-              Work History
+              <span className="sm:hidden"><FaBriefcase size={20} /></span>
+              <span className="hidden sm:inline font-poppins font-semibold">Work History</span>
             </button>
             <button
               onClick={() => setView('tech')}
-              className={`px-6 py-2 rounded-lg font-poppins font-semibold transition-all ${view === 'tech'
-                  ? 'bg-dark-orange text-white'
-                  : 'bg-dark-gray text-gray-300 hover:bg-dark-orange hover:text-white'
+              className={`p-2 sm:px-6 sm:py-2 rounded-lg transition-all ${view === 'tech'
+                ? 'bg-dark-orange text-white'
+                : 'bg-dark-gray text-gray-300 hover:bg-dark-orange hover:text-white'
                 }`}
             >
-              Tech Stack
+              <span className="sm:hidden"><FaTools size={20} /></span>
+              <span className="hidden sm:inline font-poppins font-semibold">Tech Stack</span>
             </button>
-
             <button
               onClick={() => setView('Education')}
-              className={`px-6 py-2 rounded-lg font-poppins font-semibold transition-all ${view === 'Education'
-                  ? 'bg-dark-orange text-white'
-                  : 'bg-dark-gray text-gray-300 hover:bg-dark-orange hover:text-white'
+              className={`p-2 sm:px-6 sm:py-2 rounded-lg transition-all ${view === 'Education'
+                ? 'bg-dark-orange text-white'
+                : 'bg-dark-gray text-gray-300 hover:bg-dark-orange hover:text-white'
                 }`}
             >
-              Education
+              <span className="sm:hidden"><FaSchool size={20} /></span>
+              <span className="hidden sm:inline font-poppins font-semibold">Education</span>
             </button>
           </div>
-
           {/* Content */}
           {view === 'work' ? (
             <WorkHistory />
@@ -62,7 +75,7 @@ const WorkTechSection = () => {
             <TechStack />
           ) : view === 'Education' ? ( // Added this line
             <Education />
-          ) : null} 
+          ) : null}
         </motion.div>
       </div>
     </section>
@@ -94,7 +107,7 @@ const WorkHistory = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="overflow-hidden space-y-4">
       {workData.map((work, index) => (
         <motion.div
           key={index}
@@ -114,9 +127,9 @@ const WorkHistory = () => {
 
           {/* Work Details */}
           <div className="flex-1 ml-4">
-            <h3 className="text-2xl font-poppins font-bold text-white">{work.title}</h3>
-            <p className="text-gray-300 font-poppins">{work.description}</p>
-            <p className="text-gray-400 font-poppins mt-2">{work.timeline}</p>
+            <h3 className="xl:text-2xl md:text-base font-poppins font-bold text-white">{work.title}</h3>
+            <p className="text-gray-300 xl:text-xl md:text-sm font-poppins">{work.description}</p>
+            <p className="text-gray-400 xl:text-xl md:text-sm font-poppins mt-2">{work.timeline}</p>
           </div>
         </motion.div>
       ))}
@@ -144,6 +157,8 @@ const WorkHistory = () => {
 // Tech Stack Component
 const TechStack = () => {
   // Animation variants
+
+
   const fadeInUp = {
     hidden: { opacity: 0, y: 50 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
@@ -161,7 +176,7 @@ const TechStack = () => {
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+    <div className="overflow-hidden grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
       {techData.map((tech, index) => (
         <motion.div
           key={index}
@@ -210,7 +225,7 @@ const Education = () => {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="overflow-hidden space-y-8">
       {educationData.map((edu, index) => (
         <motion.div
           key={index}
@@ -230,9 +245,9 @@ const Education = () => {
 
           {/* Education Details */}
           <div className="flex-1 ml-4">
-            <h3 className="text-2xl font-poppins font-bold text-white">{edu.title}</h3>
-            <p className="text-gray-300 font-poppins">{edu.institution}</p>
-            <p className="text-gray-400 font-poppins mt-2">{edu.timeline}</p>
+            <h3 className="xl:text-2xl md:text-base font-poppins font-bold text-white">{edu.title}</h3>
+            <p className="text-gray-300 xl:text-xl md:text-sm font-poppins">{edu.institution}</p>
+            <p className="text-gray-300 xl:text-xl md:text-sm font-poppins">{edu.timeline}</p>
           </div>
         </motion.div>
       ))}

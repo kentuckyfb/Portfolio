@@ -27,19 +27,19 @@ const ContactSection = () => {
     };
 
     return (
-        <section className="h-screen w-full flex items-center justify-center bg-dark-black py-16 px-8 lg:px-16">
-            <div className="container mx-auto max-w-6xl">
+        <section className=" w-full flex items-center justify-center bg-dark-black py-5 px-8 lg:px-16">
+            <div className="container mx-auto max-w-sm md:max-w-2xl lg:max-w-3xl xl:max-w-6xl">
                 <motion.div
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true }}
                     variants={fadeInUp}
-                    className="bg-dark-gray bg-opacity-50 backdrop-blur-md rounded-2xl p-8 border border-gray-800 shadow-lg"
+                    className="bg-dark-gray bg-opacity-50 backdrop-blur-md rounded-2xl p-4 px-4 lg:p-12 lg:px-8 border border-gray-800 shadow-lg"
                 >
                     <h2 className="text-4xl font-poppins font-bold text-white mb-8 text-center">Contact Me</h2>
 
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-                        <form className="space-y-6" ref={form} onSubmit={sendEmail}> {/* Add ref and onSubmit */}
+                        <form className="space-y-4 lg:space-y-6" ref={form} onSubmit={sendEmail}> {/* Add ref and onSubmit */}
                             {/* ... (input fields - same as before) */}
                             <div>
                                 <label htmlFor="name" className="block text-gray-300 font-poppins mb-2">Name</label>
