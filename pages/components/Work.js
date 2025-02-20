@@ -107,7 +107,7 @@ const WorkHistory = () => {
   ];
 
   return (
-    <div className="overflow-hidden space-y-4">
+    <div className="space-y-4">
       {workData.map((work, index) => (
         <motion.div
           key={index}
