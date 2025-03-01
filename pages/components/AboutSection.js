@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { X } from "lucide-react";
 import 'slick-carousel/slick/slick.css';
 import 'slick-carousel/slick/slick-theme.css';
+import { ArrowRight, X } from "lucide-react";
+
 
 const projects = [
     {
@@ -12,7 +13,7 @@ const projects = [
         description: "AI model detects diabetic retinopathy from eye images with 76% accuracy. Still in development.",
         date: "July 2024",
         repoLink: "https://github.com/kentuckyfb/SightGuard",
-        videoUrl: "https://www.youtube.com/watch?v=K8veqjOV52w", // Replace with actual YouTube video ID
+        videoUrl: "", // TODO: Replace with actual YouTube video ID
     },
     {
         id: 2,
@@ -20,7 +21,7 @@ const projects = [
         description: "Chrome extension injects custom JS/CSS for client-side web scraping. Define scraping logic via scripts to extract website data efficiently.",
         date: "January 2025",
         repoLink: "https://github.com/kentuckyfb/TweakIng",
-        videoUrl: "https://www.youtube.com/watch?v=-_U9vF55YJo",
+        videoUrl: "",
     },
     {
         id: 3,
@@ -28,7 +29,7 @@ const projects = [
         description: "Web scraping bot automates data extraction from websites.  It gathers targeted information for analysis, research, or other uses, saving time and effort.",
         date: "June 2024",
         repoLink: "https://github.com/kentuckyfb/WebSight",
-        videoUrl: "https://www.youtube.com/watch?v=ao9IzQWBemg",
+        videoUrl: "",
     },
 ];
 
@@ -74,12 +75,13 @@ const AboutSection = () => {
                             </ul>
                         </div>
                     </div>
+
                 </motion.div>
 
                 {/* Projects Section */}
                 <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeInUp} className="w-full lg:w-auto space-y-8">
                     <h2 className="text-4xl sm:text-4xl md:text-5xl lg:text-5xl 2xl:text-7xl font-poppins font-bold text-white text-center lg:text-left">Recent <br /> Projects</h2>
-                    <div className="space-y-2 ">
+                    <div className="space-y-2">
                         {projects.map((project) => (
                             <motion.div
                                 key={project.id}
@@ -91,7 +93,7 @@ const AboutSection = () => {
                                 onClick={() => setSelectedProject(project)}
                             >
                                 <div className="flex flex-col lg:flex-row items-center lg:items-start space-y-6 lg:space-y-0 lg:space-x-6 transition-transform duration-300 hover:scale-105">
-                                    <div className="relative w-24 h-24 lg:w-32 lg:h-32 rounded-lg overflow-hidden ">
+                                    <div className="relative w-24 h-24 lg:w-32 lg:h-32 rounded-lg overflow-hidden">
                                         <Image src={`/project${project.id}.png`} alt={`Project ${project.id}`} layout="fill" objectFit="cover" />
                                     </div>
                                     <div className="flex-1">
@@ -104,8 +106,25 @@ const AboutSection = () => {
                             </motion.div>
                         ))}
                     </div>
+
+                    {/* Button to See More Projects */}
+                    <div className="flex justify-center lg:justify-start">
+                        <motion.a
+                            href="https://github.com/kentuckyfb"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            whileHover={{ scale: 1.05 }}
+                            whileTap={{ scale: 0.95 }}
+                            className="flex items-center justify-center gap-2 px-6 py-3 rounded-lg bg-dark-orange bg-opacity-80 backdrop-blur-md border border-orange-400 shadow-lg hover:shadow-orange-500/50 transition-all duration-300 cursor-pointer text-white font-poppins font-medium text-sm sm:text-base md:text-lg"
+                        >
+                            <span>More Projects</span>
+                            <ArrowRight className="w-5 h-5 sm:w-6 sm:h-6" />
+                        </motion.a>
+                    </div>
                 </motion.div>
             </div>
+
+
 
             {/* Modal Popup */}
             {selectedProject && (
@@ -150,6 +169,7 @@ const AboutSection = () => {
                         </button>
                     </motion.div>
                 </div>
+
             )}
         </section>
     );

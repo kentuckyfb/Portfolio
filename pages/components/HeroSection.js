@@ -1,8 +1,7 @@
-import Link from 'next/link';
 import upRightArrow from "../../public/up-right.svg";
 import Image from "next/image";
 
-const HeroSection = () => {
+const HeroSection = ({ scrollToSection, refs }) => {
     return (
         <section className="relative h-screen w-full bg-dark-black overflow-hidden">
             {/* Glowing Grid Background */}
@@ -38,28 +37,35 @@ const HeroSection = () => {
                         <input className="hidden" type="radio" name="slide" id="button-one" />
                         <input className="hidden" type="radio" name="slide" id="button-two" />
 
-                        <div className="relative cursor-scale button-container flex flex-row gap-4 sm:gap-8"> {/* Changed to flex-row */}
-                            {/* Button One */}
-                            <label className="z-[2] text-sm sm:text-xl cursor-pointer text-white flex justify-center items-center w-28 sm:w-40 h-14 hover:scale-105 transition-transform" htmlFor="button-one">
-                                <a href="#projects" className="flex items-center gap-2">
+                        <div className="relative cursor-scale button-container flex flex-row gap-4 sm:gap-8">
+                            {/* Button One - Portfolio */}
+                            <label
+                                className="z-[2] text-sm sm:text-xl cursor-pointer text-white flex justify-center items-center w-28 sm:w-40 h-14 hover:scale-105 transition-transform"
+                                htmlFor="button-one"
+                                onClick={() => scrollToSection(refs.aboutRef)} // Scroll to About section
+                            >
+                                <div className="flex items-center gap-2">
                                     Portfolio
                                     <Image src={upRightArrow} alt="Arrow" className="w-4 h-4 sm:w-5 sm:h-5" />
-                                </a>
+                                </div>
                             </label>
 
-                            {/* Button Two */}
-                            <label className="z-[2] text-sm sm:text-xl cursor-pointer text-white flex justify-center items-center w-28 sm:w-40 h-14 hover:scale-105 transition-transform" htmlFor="button-two">
-                                <a href="#contact" className="flex items-center gap-2">
+                            {/* Button Two - Hire Me */}
+                            <label
+                                className="z-[2] text-sm sm:text-xl cursor-pointer text-white flex justify-center items-center w-28 sm:w-40 h-14 hover:scale-105 transition-transform"
+                                htmlFor="button-two"
+                                onClick={() => scrollToSection(refs.contactRef)} // Scroll to Contact section
+                            >
+                                <div className="flex items-center gap-2">
                                     Hire Me
                                     <Image src={upRightArrow} alt="Arrow" className="w-4 h-4 sm:w-5 sm:h-5" />
-                                </a>
+                                </div>
                             </label>
                         </div>
 
                         <div className="slide-buttons z-[1] absolute top-3 bg-dark-orange w-28 sm:w-40 h-14 transition-transform duration-300 rounded-full"></div>
                     </div>
                 </div>
-
             </div>
         </section>
     );

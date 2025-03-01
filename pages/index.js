@@ -6,6 +6,7 @@ import AboutSection from "./components/AboutSection";
 import WorkTechSection from "./components/Work";
 import ContactSection from "./components/ContactSection";
 import Footer from "./components/Footer";
+import GitHubActivity from "./components/GitHubActivity";
 
 export default function Home() {
   const aboutRef = useRef(null);
@@ -22,12 +23,15 @@ export default function Home() {
   return (
     <div>
       <Navbar scrollToSection={scrollToSection} refs={{ homeRef, aboutRef, workRef, contactRef }} />
-      <section ref={homeRef}><HeroSection/></section>
+      <section ref={homeRef}>
+        <HeroSection scrollToSection={scrollToSection} refs={{ aboutRef, contactRef }} />
+      </section>
       <BackToTop />
       <section ref={aboutRef}><AboutSection /></section>
+      <GitHubActivity username="kentuckyfb" />
       <section ref={workRef}><WorkTechSection /></section>
       <section ref={contactRef}><ContactSection /></section>
-      <Footer scrollToSection={scrollToSection} refs={{ homeRef, aboutRef, workRef, contactRef }}/>
+      <Footer scrollToSection={scrollToSection} refs={{ homeRef, aboutRef, workRef, contactRef }} />
     </div>
   );
-}
+};
