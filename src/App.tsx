@@ -3,26 +3,46 @@ import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
 import {
   siCss,
   siAxios,
+  siCapacitor,
+  siChartdotjs,
+  siCplusplus,
   siExpress,
+  siElectron,
   siFirebase,
+  siFramer,
   siGithub,
+  siGit,
   siGooglegemini,
   siHtml5,
+  siHuggingface,
   siJavascript,
+  siJupyter,
   siMongodb,
+  siMui,
   siNextdotjs,
   siNodedotjs,
+  siNumpy,
+  siPandas,
+  siPlotly,
   siPwa,
   siPython,
+  siPytorch,
+  siRadixui,
   siReact,
+  siReactquery,
   siRedux,
   siSharp,
+  siScikitlearn,
   siSupabase,
   siTailwindcss,
+  siTauri,
+  siTensorflow,
   siTypescript,
   siVercel,
   siVite,
   siUnity,
+  siGreensock,
+  siZod,
   type SimpleIcon,
 } from 'simple-icons'
 import avatar from './assets/avatar.png'
@@ -110,6 +130,49 @@ const techIcons: Record<string, SimpleIcon> = {
   MongoDB: siMongodb,
 }
 
+const techLibrary: { name: string; icon: SimpleIcon }[] = [
+  { name: 'JavaScript', icon: siJavascript },
+  { name: 'TypeScript', icon: siTypescript },
+  { name: 'Python', icon: siPython },
+  { name: 'C#', icon: siSharp },
+  { name: 'C++', icon: siCplusplus },
+  { name: 'HTML', icon: siHtml5 },
+  { name: 'CSS', icon: siCss },
+  { name: 'Jupyter', icon: siJupyter },
+  { name: 'React', icon: siReact },
+  { name: 'Next.js', icon: siNextdotjs },
+  { name: 'Node.js', icon: siNodedotjs },
+  { name: 'Express', icon: siExpress },
+  { name: 'Vite', icon: siVite },
+  { name: 'Tailwind CSS', icon: siTailwindcss },
+  { name: 'Material UI', icon: siMui },
+  { name: 'Radix UI', icon: siRadixui },
+  { name: 'Redux', icon: siRedux },
+  { name: 'TanStack Query', icon: siReactquery },
+  { name: 'Framer Motion', icon: siFramer },
+  { name: 'GSAP', icon: siGreensock },
+  { name: 'Chart.js', icon: siChartdotjs },
+  { name: 'Zod', icon: siZod },
+  { name: 'Axios', icon: siAxios },
+  { name: 'Supabase', icon: siSupabase },
+  { name: 'Firebase', icon: siFirebase },
+  { name: 'MongoDB', icon: siMongodb },
+  { name: 'Unity', icon: siUnity },
+  { name: 'Capacitor', icon: siCapacitor },
+  { name: 'Electron', icon: siElectron },
+  { name: 'Tauri', icon: siTauri },
+  { name: 'TensorFlow', icon: siTensorflow },
+  { name: 'PyTorch', icon: siPytorch },
+  { name: 'scikit-learn', icon: siScikitlearn },
+  { name: 'Hugging Face', icon: siHuggingface },
+  { name: 'Pandas', icon: siPandas },
+  { name: 'NumPy', icon: siNumpy },
+  { name: 'Plotly', icon: siPlotly },
+  { name: 'Vercel', icon: siVercel },
+  { name: 'Git', icon: siGit },
+  { name: 'GitHub', icon: siGithub },
+]
+
 function BrandIcon({ icon }: { icon: SimpleIcon }) {
   return <svg viewBox="0 0 24 24" role="img" aria-hidden="true"><path d={icon.path} /></svg>
 }
@@ -189,18 +252,36 @@ function EducationPage({ entry }: { entry: EducationEntry }) {
 }
 
 function ContactPage() {
+  const [errors, setErrors] = useState<Partial<Record<'name' | 'email' | 'message', string>>>({})
+
   const sendMessage = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const data = new FormData(event.currentTarget)
-    const subject = encodeURIComponent(`Portfolio enquiry from ${data.get('name')}`)
-    const body = encodeURIComponent(`${data.get('message')}\n\nFrom: ${data.get('email')}`)
+    const name = String(data.get('name') ?? '').trim()
+    const email = String(data.get('email') ?? '').trim()
+    const message = String(data.get('message') ?? '').trim()
+    const nextErrors: typeof errors = {}
+
+    if (!name) nextErrors.name = 'Enter your name'
+    if (!email) nextErrors.email = 'Enter your email'
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) nextErrors.email = 'Enter a valid email'
+    if (!message) nextErrors.message = 'Enter a message'
+
+    setErrors(nextErrors)
+    if (Object.keys(nextErrors).length > 0) return
+
+    const subject = encodeURIComponent(`Portfolio enquiry from ${name}`)
+    const body = encodeURIComponent(`${message}\n\nFrom: ${email}`)
     window.location.href = `mailto:nathanhimesh5@gmail.com?subject=${subject}&body=${body}`
+  }
+
+  const clearError = (field: 'name' | 'email' | 'message') => {
+    setErrors((current) => ({ ...current, [field]: undefined }))
   }
 
   return (
     <article className="contact-page">
       <section className="contact-intro">
-        <p className="section-kicker">Contact</p>
         <h1>Get in touch</h1>
         <p>Have a project, an idea, or just want to say hi?</p>
         <div className="contact-details">
@@ -210,12 +291,39 @@ function ContactPage() {
         </div>
       </section>
 
-      <form className="contact-form" onSubmit={sendMessage}>
-        <label>Name<input name="name" type="text" autoComplete="name" required /></label>
-        <label>Email<input name="email" type="email" autoComplete="email" required /></label>
-        <label>Message<textarea name="message" rows={5} required /></label>
-        <button type="submit">Send message</button>
+      <form className="contact-form" onSubmit={sendMessage} noValidate>
+        <div className={`contact-field ${errors.name ? 'invalid' : ''}`}>
+          <label><span className="sr-only">Name</span><input name="name" type="text" autoComplete="name" placeholder="Name" aria-invalid={Boolean(errors.name)} onInput={() => clearError('name')} /></label>
+          {errors.name && <span className="field-error" role="alert">{errors.name}</span>}
+        </div>
+        <div className={`contact-field ${errors.email ? 'invalid' : ''}`}>
+          <label><span className="sr-only">Email</span><input name="email" type="email" autoComplete="email" placeholder="Email" aria-invalid={Boolean(errors.email)} onInput={() => clearError('email')} /></label>
+          {errors.email && <span className="field-error" role="alert">{errors.email}</span>}
+        </div>
+        <div className={`contact-field ${errors.message ? 'invalid' : ''}`}>
+          <label><span className="sr-only">Message</span><textarea name="message" rows={5} placeholder="Message" aria-invalid={Boolean(errors.message)} onInput={() => clearError('message')} /></label>
+          {errors.message && <span className="field-error" role="alert">{errors.message}</span>}
+        </div>
+        <button type="submit" aria-label="Send message" title="Send message">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 2 9.7 14.3M22 2l-7 20-5.3-7.7L2 9l20-7Z" /></svg>
+        </button>
       </form>
+    </article>
+  )
+}
+
+function TechLibraryPage() {
+  return (
+    <article className="tech-library" data-scroll-region>
+      <h1>Tech stacks</h1>
+      <div className="tech-grid">
+        {techLibrary.map(({ name, icon }) => (
+          <div className="tech-app" key={name} title={name} aria-label={name}>
+            <div className="tech-app-icon" style={{ color: name === 'Unity' ? '#181817' : `#${icon.hex}` }}><BrandIcon icon={icon} /></div>
+            <span>{name}</span>
+          </div>
+        ))}
+      </div>
     </article>
   )
 }
@@ -338,7 +446,7 @@ export default function App() {
             </div>
           )}
 
-          {(current.kind === 'main' || current.kind === 'sub') && current.id !== 'contact' && (
+          {(current.kind === 'main' || current.kind === 'sub') && !['contact', 'stack'].includes(current.id) && (
             <div className="empty-state">
               <p className="section-kicker">{current.kind === 'sub' ? current.group : 'Section'}</p>
               <h1>{current.label}</h1>
@@ -350,6 +458,7 @@ export default function App() {
           {current.kind === 'career' && current.career && <CareerPage entry={current.career} />}
           {current.kind === 'education' && current.education && <EducationPage entry={current.education} />}
           {current.id === 'contact' && <ContactPage />}
+          {current.id === 'stack' && <TechLibraryPage />}
         </motion.section>
       </AnimatePresence>
     </main>

@@ -33,6 +33,7 @@
 html, body, #root { min-height: 100%; }
 body { margin: 0; overflow: hidden; }
 button { color: inherit; font: inherit; }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
 
 .canvas {
   position: relative;
@@ -171,11 +172,27 @@ button { color: inherit; font: inherit; }
 .contact-intro > p:not(.section-kicker) { max-width: 380px; margin: 22px 0 0; color: var(--muted); font-family: 'Kalam', cursive; font-size: 1.15rem; }
 .contact-details { display: grid; gap: 8px; margin-top: 30px; }
 .contact-details a { width: fit-content; color: var(--ink); font-size: .78rem; text-underline-offset: 4px; }
-.contact-form { display: grid; gap: 16px; padding-top: 18px; border-top: 1px solid var(--line); }
-.contact-form label { display: grid; gap: 7px; color: #6b6a64; font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+.contact-form { display: grid; gap: 16px; }
+.contact-field { position: relative; padding-bottom: 15px; }
+.contact-form label { display: block; }
 .contact-form input, .contact-form textarea { width: 100%; padding: 10px 0; color: var(--ink); font: 500 1rem/1.4 'Manrope Variable', sans-serif; background: transparent; border: 0; border-bottom: 1px solid var(--line); border-radius: 0; outline: 0; resize: none; transition: border-color .2s ease; }
+.contact-form input::placeholder, .contact-form textarea::placeholder { color: #6b6a64; font-size: .7rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; opacity: 1; }
 .contact-form input:focus, .contact-form textarea:focus { border-color: var(--ink); }
-.contact-form button { width: fit-content; padding: 10px 16px; color: var(--paper); font-size: .78rem; font-weight: 700; background: var(--ink); border: 0; border-radius: 999px; cursor: pointer; }
+.contact-field.invalid input, .contact-field.invalid textarea { border-color: #c23f2a; }
+.field-error { position: absolute; bottom: -1px; left: 0; color: #c23f2a; font-size: .68rem; }
+.contact-form button { display: grid; width: 42px; height: 42px; padding: 0; place-items: center; color: var(--paper); background: var(--ink); border: 0; border-radius: 50%; cursor: pointer; transition: transform .2s ease; }
+.contact-form button:hover { transform: rotate(-5deg) scale(1.05); }
+.contact-form button svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+
+.tech-library { width: min(860px, 100%); max-height: 82dvh; overflow-y: auto; scrollbar-width: none; }
+.tech-library::-webkit-scrollbar { display: none; }
+.tech-library h1 { margin: 0 0 34px; font-size: clamp(3rem, 7vw, 6.5rem); line-height: .88; letter-spacing: -.075em; }
+.tech-grid { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: 30px 18px; }
+.tech-app { display: grid; gap: 8px; place-items: center; min-width: 0; text-align: center; }
+.tech-app-icon { display: grid; place-items: center; transition: transform .22s ease; }
+.tech-app:hover .tech-app-icon { transform: translateY(-3px) scale(1.08); }
+.tech-app-icon svg { width: 36px; height: 36px; fill: currentColor; }
+.tech-app > span { width: 100%; overflow: hidden; color: #686761; font-size: .66rem; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
 
 @media (max-width: 720px) {
   .explorer { top: 14px; left: 12px; width: calc(100vw - 24px); padding: 7px; background: rgba(246, 245, 239, .9); border: 1px solid var(--line); border-radius: 9px; backdrop-filter: blur(14px); }
@@ -200,9 +217,14 @@ button { color: inherit; font: inherit; }
   .contact-intro h1 { font-size: clamp(3rem, 14vw, 5rem); }
   .contact-intro > p:not(.section-kicker) { margin-top: 12px; font-size: 1rem; }
   .contact-details { display: flex; flex-wrap: wrap; gap: 8px 16px; margin-top: 14px; }
-  .contact-form { gap: 9px; padding-top: 12px; }
+  .contact-form { gap: 7px; }
   .contact-form input, .contact-form textarea { padding: 6px 0; font-size: .9rem; }
   .contact-form textarea { max-height: 76px; }
+  .tech-library { max-height: calc(100dvh - 126px); }
+  .tech-library h1 { margin-bottom: 22px; font-size: clamp(3rem, 14vw, 5rem); }
+  .tech-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px 8px; padding-bottom: 24px; }
+  .tech-app-icon svg { width: 23px; height: 23px; }
+  .tech-app > span { font-size: .58rem; }
   .write-in { font-size: clamp(3.7rem, 18vw, 6rem); white-space: normal; }
 }
 
