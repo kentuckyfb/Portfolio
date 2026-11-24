@@ -1,7 +1,5 @@
 # Kentucky
 
-A personal portfolio for Nathan Himesh, built around full-screen section transitions and an explorer-style navigation tree.
-
 ## Preview
 
 ![Kentucky portfolio landing page](docs/portfolio-preview.png)
