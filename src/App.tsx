@@ -304,7 +304,7 @@ function ContactPage() {
 
 function ProjectsOverview() {
   return (
-    <article className="projects-overview" data-scroll-region>
+    <article className="projects-overview">
       <header className="empty-state">
         <h1>Projects</h1>
         <p>Selected work and experiments.</p>
