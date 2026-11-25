@@ -85,15 +85,15 @@ type NavGroup = {
   id: string
   label: string
   note: string
-  children?: { id: string; label: string }[]
+  children?: { id: string; label: string; lines?: [string, string] }[]
   timeline?: boolean
 }
 
 const groups: NavGroup[] = [
   { id: 'about', label: 'About me', note: 'A little more personal.', children: [{ id: 'about-personal', label: 'A bit more personal' }] },
   { id: 'projects', label: 'Projects', note: "Tech stacks I've used.", children: projects.map(({ id, name }) => ({ id: `project-${id}`, label: name })) },
-  { id: 'career', label: 'Career', note: 'Where I have worked.', timeline: true, children: career.map(({ id, role, period }) => ({ id: `career-${id}`, label: `${period} · ${role}` })) },
-  { id: 'education', label: 'Education', note: 'How I got here.', timeline: true, children: education.map(({ id, qualification, period }) => ({ id: `education-${id}`, label: `${period} · ${qualification}` })) },
+  { id: 'career', label: 'Career', note: 'Where I have worked.', timeline: true, children: career.map(({ id, role, period }) => ({ id: `career-${id}`, label: role, lines: [period, role] })) },
+  { id: 'education', label: 'Education', note: 'How I got here.', timeline: true, children: education.map(({ id, qualification, period }) => ({ id: `education-${id}`, label: qualification, lines: [period, qualification] })) },
   { id: 'contact', label: 'Get in touch', note: 'Let’s make something.' },
 ]
 
@@ -561,6 +561,7 @@ export default function App() {
             const open = previewGroup ? previewGroup === group.id : selected
             const navKey = group.timeline ? `group-${group.id}` : group.id
             const activeChildIndex = group.children?.findIndex((child) => child.id === current.id) ?? -1
+            const childRowHeight = group.timeline ? 54 : 25
             return (
               <div className={`branch ${selected ? 'selected' : ''}`} key={group.id}>
                 <button
@@ -582,8 +583,8 @@ export default function App() {
                 <AnimatePresence initial={false}>
                   {open && group.children && group.children.length > 0 && (
                     <motion.div
-                      className={`subtree ${activeChildIndex >= 0 ? 'has-active' : ''}`}
-                      style={{ '--active-path-height': `${activeChildIndex * 25 + 12.5}px` } as CSSProperties}
+                      className={`subtree ${group.timeline ? 'timeline-subtree' : ''} ${activeChildIndex >= 0 ? 'has-active' : ''}`}
+                      style={{ '--child-row-height': `${childRowHeight}px`, '--child-row-half': `${childRowHeight / 2}px`, '--active-path-height': `${activeChildIndex * childRowHeight + childRowHeight / 2}px` } as CSSProperties}
                       initial={{ height: 0, opacity: 0, x: -5 }}
                       animate={{ height: 'auto', opacity: 1, x: 0 }}
                       exit={{ height: 0, opacity: 0, x: -5 }}
@@ -595,12 +596,14 @@ export default function App() {
                           className={current.id === child.id ? 'active' : ''}
                           data-nav-key={child.id}
                           data-nav-page={child.id}
-                          title={child.label}
+                          title={child.lines?.join(' — ') ?? child.label}
                           onClick={() => navigateTo(child.id)}
                           aria-current={current.id === child.id ? 'page' : undefined}
                         >
                           <span className="nav-label-text">
-                            <span className="nav-label-copy">{child.label}</span>
+                            {child.lines ? (
+                              <span className="nav-label-copy nav-label-timeline"><span>{child.lines[0]}</span><span>{child.lines[1]}</span></span>
+                            ) : <span className="nav-label-copy">{child.label}</span>}
                             {renderActiveBox(child.id, 'child')}
                           </span>
                         </button>
