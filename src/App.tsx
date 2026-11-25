@@ -225,12 +225,10 @@ function ProjectPage({ project }: { project: Project }) {
         <div className="project-links">
           <a className="project-link" href={project.repository} target="_blank" rel="noreferrer" aria-label={`Open ${project.name} on GitHub`}>
             <BrandIcon icon={siGithub} />
-            <svg className="external-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M19 14v5H5V5h5" /></svg>
           </a>
           {project.url !== project.repository && (
             <a className="project-link" href={project.url} target="_blank" rel="noreferrer" aria-label={`Open ${project.name} website`}>
               <svg className="website-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c2.3 2.5 3.5 5.5 3.5 9s-1.2 6.5-3.5 9c-2.3-2.5-3.5-5.5-3.5-9S9.7 5.5 12 3Z" /></svg>
-              <svg className="external-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 5h5v5M19 5l-8 8M19 14v5H5V5h5" /></svg>
             </a>
           )}
         </div>
