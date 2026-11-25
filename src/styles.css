@@ -119,6 +119,7 @@ button { color: inherit; font: inherit; }
 .branch-label { color: #6f6e68; font-size: .82rem; transition: color .2s ease, background .2s ease, transform .25s ease; }
 .branch-label:hover { color: var(--ink); background: rgba(24, 24, 23, .045); transform: translateX(2px); }
 .branch.selected .branch-label { color: var(--ink); font-weight: 650; }
+.branch.selected .branch-label:hover { background: transparent; }
 
 .subtree { margin: 0 0 4px 23px; overflow: hidden; border-left: 1px solid var(--line); }
 .subtree button { position: relative; display: block; width: 100%; padding: 5px 9px 5px 15px; color: var(--muted); font-size: .75rem; text-align: left; background: none; border: 0; cursor: pointer; transition: color .2s ease, transform .2s ease; }
