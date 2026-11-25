@@ -148,9 +148,10 @@ button { color: inherit; font: inherit; }
 @keyframes nav-path-ink { from { opacity: .2; } to { opacity: 1; } }
 
 .stage { align-self: center; justify-self: center; width: min(900px, calc(100% - 48px)); padding-left: clamp(0px, 12vw, 180px); }
+.detail-title-slot { min-height: .86em; }
 .detail-page-title { display: inline-block; transform-origin: left center; }
 .nav-title-connector { position: fixed; z-index: 9; inset: 0; width: 100vw; height: 100dvh; overflow: visible; pointer-events: none; }
-.nav-title-connector polyline { fill: none; stroke: var(--accent); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.nav-title-connector line { fill: none; stroke: var(--accent); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .welcome { position: relative; display: inline-block; }
 .handwritten { margin: 0; font-family: 'Caveat Variable', cursive; font-weight: 520; }
 .write-in { font-size: clamp(4rem, 10vw, 9rem); line-height: .9; letter-spacing: -.055em; white-space: nowrap; }

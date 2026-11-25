@@ -124,8 +124,12 @@ const pages: Page[] = [
   ]),
 ]
 
-const TRANSITION_MS = 680
+const TITLE_COLLAPSE_MS = 900
+const NAV_SHIFT_MS = 700
+const TITLE_EXPAND_MS = 950
+const TRANSITION_MS = TITLE_COLLAPSE_MS + NAV_SHIFT_MS + TITLE_EXPAND_MS
 const detailTitleId = (id: string) => `detail-title-${id}`
+const detailTitleTransition = { layout: { duration: TITLE_COLLAPSE_MS / 1000, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } }
 
 type TechEntry = { name: string; icon?: SimpleIcon; monogram?: string }
 type TechCategory = { label: string; color: string; items: TechEntry[] }
@@ -217,14 +221,14 @@ function TechMark({ name }: { name: string }) {
     : <span className="tech-fallback">{tech?.monogram ?? name.slice(0, 2)}</span>
 }
 
-function ProjectPage({ project }: { project: Project }) {
+function ProjectPage({ project, showTitle }: { project: Project; showTitle: boolean }) {
   return (
     <article className="project-page">
       <header className="project-header">
-        <h1 data-page-title>
-          <motion.span className="detail-page-title" layoutId={detailTitleId(`project-${project.id}`)}>
+        <h1 className="detail-title-slot" data-page-title={showTitle ? '' : undefined}>
+          {showTitle && <motion.span className="detail-page-title" layoutId={detailTitleId(`project-${project.id}`)} transition={detailTitleTransition}>
             <a href={project.url} target="_blank" rel="noreferrer">{project.name}</a>
-          </motion.span>
+          </motion.span>}
         </h1>
         <p className="project-description">{project.description}</p>
         <div className="project-links">
@@ -261,11 +265,11 @@ function ProjectPage({ project }: { project: Project }) {
   )
 }
 
-function CareerPage({ entry }: { entry: CareerEntry }) {
+function CareerPage({ entry, showTitle }: { entry: CareerEntry; showTitle: boolean }) {
   return (
     <article className="timeline-page">
       <p className="timeline-period">{entry.period}</p>
-      <h1 data-page-title><motion.span className="detail-page-title" layoutId={detailTitleId(`career-${entry.id}`)}>{entry.role}</motion.span></h1>
+      <h1 className="detail-title-slot" data-page-title={showTitle ? '' : undefined}>{showTitle && <motion.span className="detail-page-title" layoutId={detailTitleId(`career-${entry.id}`)} transition={detailTitleTransition}>{entry.role}</motion.span>}</h1>
       <p className="timeline-place">{entry.company}</p>
       {entry.description && <p className="timeline-description">{entry.description}</p>}
       {(entry.tech.length > 0 || entry.skills.length > 0) && (
@@ -278,11 +282,11 @@ function CareerPage({ entry }: { entry: CareerEntry }) {
   )
 }
 
-function EducationPage({ entry }: { entry: EducationEntry }) {
+function EducationPage({ entry, showTitle }: { entry: EducationEntry; showTitle: boolean }) {
   return (
     <article className="timeline-page">
       <p className="timeline-period">{entry.period}</p>
-      <h1 data-page-title><motion.span className="detail-page-title" layoutId={detailTitleId(`education-${entry.id}`)}>{entry.qualification}</motion.span></h1>
+      <h1 className="detail-title-slot" data-page-title={showTitle ? '' : undefined}>{showTitle && <motion.span className="detail-page-title" layoutId={detailTitleId(`education-${entry.id}`)} transition={detailTitleTransition}>{entry.qualification}</motion.span>}</h1>
       <p className="timeline-place">{entry.institution}</p>
       {entry.learned.length > 0 && (
         <div className="timeline-details timeline-learning">
@@ -439,9 +443,11 @@ export default function App() {
   const [previewGroup, setPreviewGroup] = useState<string | null>(null)
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const [connector, setConnector] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null)
+  const [detailCollapsed, setDetailCollapsed] = useState(false)
   const locked = useRef(false)
   const draggingBox = useRef(false)
   const direction = useRef(1)
+  const transitionTimers = useRef<number[]>([])
   const current = pages[active]
   const detailPage = ['project', 'career', 'education'].includes(current.kind)
 
@@ -451,9 +457,43 @@ export default function App() {
     locked.current = true
     direction.current = target > active ? 1 : -1
     setPreviewGroup(null)
+    const fromDetail = ['project', 'career', 'education'].includes(pages[active].kind)
+    const toDetail = ['project', 'career', 'education'].includes(pages[target].kind)
+    const schedule = (callback: () => void, delay: number) => {
+      transitionTimers.current.push(window.setTimeout(callback, delay))
+    }
+
+    transitionTimers.current.forEach(window.clearTimeout)
+    transitionTimers.current = []
+
+    if (fromDetail) {
+      setDetailCollapsed(true)
+      schedule(() => {
+        setActive(target)
+        if (toDetail) {
+          schedule(() => setDetailCollapsed(false), NAV_SHIFT_MS)
+          schedule(() => { locked.current = false }, NAV_SHIFT_MS + TITLE_EXPAND_MS)
+        } else {
+          setDetailCollapsed(false)
+          schedule(() => { locked.current = false }, NAV_SHIFT_MS)
+        }
+      }, TITLE_COLLAPSE_MS)
+      return
+    }
+
+    if (toDetail) {
+      setDetailCollapsed(true)
+      setActive(target)
+      schedule(() => setDetailCollapsed(false), NAV_SHIFT_MS)
+      schedule(() => { locked.current = false }, NAV_SHIFT_MS + TITLE_EXPAND_MS)
+      return
+    }
+
     setActive(target)
-    window.setTimeout(() => { locked.current = false }, TRANSITION_MS)
+    schedule(() => { locked.current = false }, 680)
   }, [active])
+
+  useEffect(() => () => transitionTimers.current.forEach(window.clearTimeout), [])
 
   const navigateTo = (id: string) => navigate(pages.findIndex((page) => page.id === id))
 
@@ -489,8 +529,8 @@ export default function App() {
     setHoveredNav(target?.dataset.navKey ?? null)
   }
 
-  const renderActiveBox = (key: string, level: 'home' | 'main' | 'child') => {
-    const activeBox = current.id === key
+  const renderActiveBox = (key: string, level: 'home' | 'main' | 'child', forceActive = false) => {
+    const activeBox = forceActive || current.id === key
     const hoverBox = hoveredNav === key && !activeBox
     return (
       <>
@@ -560,14 +600,15 @@ export default function App() {
       const navItem = [...document.querySelectorAll<HTMLElement>('[data-nav-page]')]
         .find((item) => item.dataset.navPage === current.id && item.offsetParent !== null)
       const title = document.querySelector<HTMLElement>('[data-page-title]')
-      if (navItem && title) {
-        const navRect = (navItem.querySelector<HTMLElement>('.nav-active-box') ?? navItem).getBoundingClientRect()
-        const titleRect = title.getBoundingClientRect()
+      const stage = document.querySelector<HTMLElement>('.stage')
+      if (navItem && (title || stage)) {
+        const navRect = (navItem.querySelector<HTMLElement>('.nav-label-text') ?? navItem).getBoundingClientRect()
+        const titleRect = (title ?? stage)!.getBoundingClientRect()
         setConnector({
           x1: navRect.right,
           y1: navRect.top + navRect.height / 2,
           x2: titleRect.left - 12,
-          y2: titleRect.top + titleRect.height / 2,
+          y2: navRect.top + navRect.height / 2,
         })
       }
       if (performance.now() - started < TRANSITION_MS + 120) frame = requestAnimationFrame(measure)
@@ -579,7 +620,7 @@ export default function App() {
       cancelAnimationFrame(frame)
       window.removeEventListener('resize', measure)
     }
-  }, [current.id, detailPage])
+  }, [current.id, detailPage, detailCollapsed])
 
   return (
     <main className="canvas">
@@ -618,7 +659,7 @@ export default function App() {
                 >
                   <span className="nav-label-text">
                     {group.label}
-                    {renderActiveBox(navKey, 'main')}
+                    {renderActiveBox(navKey, 'main', selected && detailPage)}
                   </span>
                 </button>
 
@@ -639,6 +680,7 @@ export default function App() {
                       >
                         {group.children.map((child) => {
                           const childActive = current.id === child.id
+                          const childTitleExpanded = childActive && detailPage && !detailCollapsed
                           return (
                             <button
                               key={child.id}
@@ -653,13 +695,13 @@ export default function App() {
                                 {child.lines ? (
                                   <span className="nav-label-copy nav-label-timeline">
                                     <span>{child.lines[0]}</span>
-                                    {!childActive && <motion.span layoutId={detailTitleId(child.id)}>{child.lines[1]}</motion.span>}
+                                    {!childTitleExpanded && <motion.span layoutId={detailTitleId(child.id)} transition={detailTitleTransition}>{child.lines[1]}</motion.span>}
                                   </span>
-                                ) : !childActive && (
-                                  <motion.span className="nav-label-copy" layoutId={detailTitleId(child.id)}>{child.label}</motion.span>
+                                ) : !childTitleExpanded && (
+                                  <motion.span className="nav-label-copy" layoutId={detailTitleId(child.id)} transition={detailTitleTransition}>{child.label}</motion.span>
                                 )}
-                                {childActive && <span className="nav-label-space" aria-hidden="true">{child.label}</span>}
-                                {renderActiveBox(child.id, 'child')}
+                                {childTitleExpanded && <span className="nav-label-space" aria-hidden="true">{child.label}</span>}
+                                {(!childActive || !detailPage) && renderActiveBox(child.id, 'child')}
                               </span>
                             </button>
                           )
@@ -676,7 +718,7 @@ export default function App() {
 
       {connector && (
         <svg className="nav-title-connector" aria-hidden="true">
-          <polyline points={`${connector.x1},${connector.y1} ${connector.x2 - 22},${connector.y1} ${connector.x2 - 22},${connector.y2} ${connector.x2},${connector.y2}`} />
+          <line x1={connector.x1} y1={connector.y1} x2={connector.x2} y2={connector.y1} />
         </svg>
       )}
 
@@ -708,9 +750,9 @@ export default function App() {
             </div>
           )}
 
-          {current.kind === 'project' && current.project && <ProjectPage project={current.project} />}
-          {current.kind === 'career' && current.career && <CareerPage entry={current.career} />}
-          {current.kind === 'education' && current.education && <EducationPage entry={current.education} />}
+          {current.kind === 'project' && current.project && <ProjectPage project={current.project} showTitle={!detailCollapsed} />}
+          {current.kind === 'career' && current.career && <CareerPage entry={current.career} showTitle={!detailCollapsed} />}
+          {current.kind === 'education' && current.education && <EducationPage entry={current.education} showTitle={!detailCollapsed} />}
           {current.id === 'contact' && <ContactPage />}
         </motion.section>
       </AnimatePresence>
