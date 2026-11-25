@@ -681,7 +681,7 @@ export default function App() {
                 <AnimatePresence initial={false}>
                   {open && group.children && group.children.length > 0 && (
                     <motion.div
-                      className={`subtree ${group.timeline ? 'timeline-subtree' : ''} ${activeChildIndex >= 0 ? 'has-active' : ''}`}
+                      className={`subtree ${group.timeline ? 'timeline-subtree' : ''} ${activeChildIndex >= 0 ? 'has-active' : ''} ${selected && detailPage ? 'detail-subtree' : ''}`}
                       style={{ '--child-row-height': `${childRowHeight}px`, '--child-row-half': `${childRowHeight / 2}px`, '--active-path-height': `${activeChildIndex >= 0 ? childRowHeight / 2 : 0}px` } as CSSProperties}
                       initial={{ height: 0, opacity: 0, x: -5 }}
                       animate={{ height: (group.children.length - Math.max(activeChildIndex, 0)) * childRowHeight, opacity: 1, x: 0 }}
@@ -749,9 +749,9 @@ export default function App() {
         <motion.section
           key={current.id}
           className={`stage stage-${current.kind} ${current.id === 'projects' ? 'stage-projects' : ''}`}
-          initial={{ opacity: 0, y: 36 }}
+          initial={detailPage ? { opacity: 0, y: 0 } : { opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -30 }}
+          exit={detailPage ? { opacity: 0, y: 0 } : { opacity: 0, y: -30 }}
           transition={{ duration: .56, ease: [0.22, 1, 0.36, 1] }}
           aria-live="polite"
         >

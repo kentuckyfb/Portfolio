@@ -142,6 +142,7 @@ button { color: inherit; font: inherit; }
 .subtree button::before { position: absolute; top: 50%; left: 0; width: 9px; height: 1px; content: ''; background: var(--line); }
 .subtree button:hover, .subtree button.active { color: var(--ink); }
 .subtree button.active::before { background: var(--accent); animation: nav-path-x .24s cubic-bezier(.22, 1, .36, 1) both; transform-origin: left; }
+.detail-subtree button.active::before { background: transparent; animation: none; }
 
 @keyframes nav-path-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes nav-path-ink { from { opacity: .2; } to { opacity: 1; } }
