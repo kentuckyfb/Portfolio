@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { useCallback, useEffect, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import {
   siCss,
   siAxios,
@@ -33,6 +33,7 @@ import {
   siRedux,
   siSharp,
   siScikitlearn,
+  siScrapy,
   siSupabase,
   siTailwindcss,
   siTauri,
@@ -73,7 +74,6 @@ const groups: NavGroup[] = [
   { id: 'projects', label: 'Projects', note: 'Selected work and experiments.', children: projects.map(({ id, name }) => ({ id: `project-${id}`, label: name })) },
   { id: 'career', label: 'Career', note: 'Where I have worked.', timeline: true, children: career.map(({ id, role, period }) => ({ id: `career-${id}`, label: `${period} · ${role}` })) },
   { id: 'education', label: 'Education', note: 'How I got here.', timeline: true, children: education.map(({ id, qualification, period }) => ({ id: `education-${id}`, label: `${period} · ${qualification}` })) },
-  { id: 'stack', label: 'Tech stacks', note: 'Tools I have used.' },
   { id: 'contact', label: 'Get in touch', note: 'Let’s make something.' },
 ]
 
@@ -106,75 +106,65 @@ const pages: Page[] = [
 
 const TRANSITION_MS = 680
 
-const techIcons: Record<string, SimpleIcon> = {
-  CSS: siCss,
-  HTML: siHtml5,
-  JavaScript: siJavascript,
-  Axios: siAxios,
-  'C#': siSharp,
-  Express: siExpress,
-  Firebase: siFirebase,
-  'Gemini API': siGooglegemini,
-  'Next.js': siNextdotjs,
-  'Node.js': siNodedotjs,
-  PWA: siPwa,
-  Python: siPython,
-  React: siReact,
-  Redux: siRedux,
-  Supabase: siSupabase,
-  'Tailwind CSS': siTailwindcss,
-  TypeScript: siTypescript,
-  Vercel: siVercel,
-  Vite: siVite,
-  Unity: siUnity,
-  MongoDB: siMongodb,
-}
+type TechEntry = { name: string; icon?: SimpleIcon; monogram?: string }
+type TechCategory = { label: string; color: string; items: TechEntry[] }
 
-const techLibrary: { name: string; icon: SimpleIcon }[] = [
-  { name: 'JavaScript', icon: siJavascript },
-  { name: 'TypeScript', icon: siTypescript },
-  { name: 'Python', icon: siPython },
-  { name: 'C#', icon: siSharp },
-  { name: 'C++', icon: siCplusplus },
-  { name: 'HTML', icon: siHtml5 },
-  { name: 'CSS', icon: siCss },
-  { name: 'Jupyter', icon: siJupyter },
-  { name: 'React', icon: siReact },
-  { name: 'Next.js', icon: siNextdotjs },
-  { name: 'Node.js', icon: siNodedotjs },
-  { name: 'Express', icon: siExpress },
-  { name: 'Vite', icon: siVite },
-  { name: 'Tailwind CSS', icon: siTailwindcss },
-  { name: 'Material UI', icon: siMui },
-  { name: 'Radix UI', icon: siRadixui },
-  { name: 'Redux', icon: siRedux },
-  { name: 'TanStack Query', icon: siReactquery },
-  { name: 'Framer Motion', icon: siFramer },
-  { name: 'GSAP', icon: siGreensock },
-  { name: 'Chart.js', icon: siChartdotjs },
-  { name: 'Zod', icon: siZod },
-  { name: 'Axios', icon: siAxios },
-  { name: 'Supabase', icon: siSupabase },
-  { name: 'Firebase', icon: siFirebase },
-  { name: 'MongoDB', icon: siMongodb },
-  { name: 'Unity', icon: siUnity },
-  { name: 'Capacitor', icon: siCapacitor },
-  { name: 'Electron', icon: siElectron },
-  { name: 'Tauri', icon: siTauri },
-  { name: 'TensorFlow', icon: siTensorflow },
-  { name: 'PyTorch', icon: siPytorch },
-  { name: 'scikit-learn', icon: siScikitlearn },
-  { name: 'Hugging Face', icon: siHuggingface },
-  { name: 'Pandas', icon: siPandas },
-  { name: 'NumPy', icon: siNumpy },
-  { name: 'Plotly', icon: siPlotly },
-  { name: 'Vercel', icon: siVercel },
-  { name: 'Git', icon: siGit },
-  { name: 'GitHub', icon: siGithub },
+const techCategories: TechCategory[] = [
+  { label: 'Languages & markup', color: '#f4cf4f', items: [
+    { name: 'JavaScript', icon: siJavascript }, { name: 'TypeScript', icon: siTypescript },
+    { name: 'Python', icon: siPython }, { name: 'C#', icon: siSharp }, { name: 'C++', icon: siCplusplus },
+    { name: 'HTML', icon: siHtml5 }, { name: 'CSS', icon: siCss },
+    { name: 'ShaderLab', monogram: 'SH' }, { name: 'HLSL', monogram: 'HL' },
+  ] },
+  { label: 'Frontend & interface', color: '#ff82ad', items: [
+    { name: 'React', icon: siReact }, { name: 'Next.js', icon: siNextdotjs }, { name: 'Vite', icon: siVite },
+    { name: 'Tailwind CSS', icon: siTailwindcss }, { name: 'Material UI', icon: siMui }, { name: 'Radix UI', icon: siRadixui },
+    { name: 'Redux', icon: siRedux }, { name: 'TanStack Query', icon: siReactquery }, { name: 'Framer Motion', icon: siFramer },
+    { name: 'GSAP', icon: siGreensock }, { name: 'Chart.js', icon: siChartdotjs }, { name: 'Recharts', icon: siChartdotjs },
+    { name: 'Axios', icon: siAxios }, { name: 'Zod', icon: siZod },
+  ] },
+  { label: 'Backend & APIs', color: '#69aefc', items: [
+    { name: 'Node.js', icon: siNodedotjs }, { name: 'Express', icon: siExpress },
+    { name: 'Gemini API', icon: siGooglegemini }, { name: 'GitHub API', icon: siGithub },
+    { name: 'Web Audio API', monogram: 'WA' }, { name: 'NHTSA API', monogram: 'NH' }, { name: 'PokeAPI', monogram: 'PO' },
+  ] },
+  { label: 'Databases & realtime', color: '#6fcd91', items: [
+    { name: 'Supabase', icon: siSupabase }, { name: 'Firebase', icon: siFirebase },
+    { name: 'MongoDB', icon: siMongodb }, { name: 'Ably Realtime', monogram: 'AB' },
+  ] },
+  { label: 'Data & AI', color: '#b58cf3', items: [
+    { name: 'Jupyter', icon: siJupyter }, { name: 'TensorFlow', icon: siTensorflow }, { name: 'PyTorch', icon: siPytorch },
+    { name: 'scikit-learn', icon: siScikitlearn }, { name: 'Hugging Face', icon: siHuggingface },
+    { name: 'Pandas', icon: siPandas }, { name: 'NumPy', icon: siNumpy }, { name: 'Plotly', icon: siPlotly },
+    { name: 'NLP', icon: siScikitlearn }, { name: 'TF-IDF', icon: siScikitlearn },
+    { name: 'AI image analysis', icon: siTensorflow },
+  ] },
+  { label: 'Apps & platforms', color: '#ff9d66', items: [
+    { name: 'Unity', icon: siUnity }, { name: 'Capacitor', icon: siCapacitor },
+    { name: 'Electron', icon: siElectron }, { name: 'Tauri', icon: siTauri },
+  ] },
+  { label: 'Hosting & source control', color: '#ff7164', items: [
+    { name: 'Vercel', icon: siVercel }, { name: 'Git', icon: siGit }, { name: 'GitHub', icon: siGithub },
+  ] },
+  { label: 'Methods & standards', color: '#61cbd2', items: [
+    { name: 'PWA', icon: siPwa }, { name: 'OAuth', monogram: 'OA' }, { name: 'Web crawling', icon: siScrapy },
+    { name: 'Offline-first', monogram: 'OF' }, { name: 'Responsive design', monogram: 'RD' },
+    { name: 'REST APIs', monogram: 'API' }, { name: 'Real-time systems', monogram: 'RT' },
+  ] },
 ]
+
+const techLibrary = techCategories.flatMap(({ items }) => items)
+const techByName = new Map(techLibrary.map((tech) => [tech.name, tech]))
 
 function BrandIcon({ icon }: { icon: SimpleIcon }) {
   return <svg viewBox="0 0 24 24" role="img" aria-hidden="true"><path d={icon.path} /></svg>
+}
+
+function TechMark({ name }: { name: string }) {
+  const tech = techByName.get(name)
+  return tech?.icon
+    ? <BrandIcon icon={tech.icon} />
+    : <span className="tech-fallback">{tech?.monogram ?? name.slice(0, 2)}</span>
 }
 
 function ProjectPage({ project }: { project: Project }) {
@@ -202,7 +192,7 @@ function ProjectPage({ project }: { project: Project }) {
         <ul className="stack-list">
           {project.stack.map((item) => (
             <li key={item} title={item}>
-              {techIcons[item] ? <BrandIcon icon={techIcons[item]} /> : <span className="tech-fallback">{item.slice(0, 2)}</span>}
+              <TechMark name={item} />
               <span>{item}</span>
             </li>
           ))}
@@ -312,16 +302,26 @@ function ContactPage() {
   )
 }
 
-function TechLibraryPage() {
+function ProjectsOverview() {
   return (
-    <article className="tech-library" data-scroll-region>
-      <h1>Tech stacks</h1>
-      <div className="tech-grid">
-        {techLibrary.map(({ name, icon }) => (
-          <div className="tech-app" key={name} title={name} aria-label={name}>
-            <div className="tech-app-icon" style={{ color: name === 'Unity' ? '#181817' : `#${icon.hex}` }}><BrandIcon icon={icon} /></div>
-            <span>{name}</span>
-          </div>
+    <article className="projects-overview" data-scroll-region>
+      <header className="empty-state">
+        <h1>Projects</h1>
+        <p>Selected work and experiments.</p>
+      </header>
+      <div className="tech-categories">
+        {techCategories.map(({ label, color, items }) => (
+          <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
+            <h2>{label}</h2>
+            <div className="tech-grid">
+              {items.map(({ name, icon }) => (
+                <div className="tech-app" key={name} title={name} aria-label={name}>
+                  <div className="tech-app-icon" style={{ color: !icon || name === 'Unity' ? '#181817' : `#${icon.hex}` }}><TechMark name={name} /></div>
+                  <span>{name}</span>
+                </div>
+              ))}
+            </div>
+          </section>
         ))}
       </div>
     </article>
@@ -507,7 +507,7 @@ export default function App() {
       <AnimatePresence mode="wait" initial={false}>
         <motion.section
           key={current.id}
-          className={`stage stage-${current.kind}`}
+          className={`stage stage-${current.kind} ${current.id === 'projects' ? 'stage-projects' : ''}`}
           initial={{ opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -30 }}
@@ -523,9 +523,10 @@ export default function App() {
             </div>
           )}
 
-          {(current.kind === 'main' || current.kind === 'sub') && !['contact', 'stack'].includes(current.id) && (
+          {current.id === 'projects' && <ProjectsOverview />}
+
+          {(current.kind === 'main' || current.kind === 'sub') && !['contact', 'projects'].includes(current.id) && (
             <div className="empty-state">
-              <p className="section-kicker">{current.kind === 'sub' ? current.group : 'Section'}</p>
               <h1>{current.label}</h1>
               {current.note && <p>{current.note}</p>}
             </div>
@@ -535,7 +536,6 @@ export default function App() {
           {current.kind === 'career' && current.career && <CareerPage entry={current.career} />}
           {current.kind === 'education' && current.education && <EducationPage entry={current.education} />}
           {current.id === 'contact' && <ContactPage />}
-          {current.id === 'stack' && <TechLibraryPage />}
         </motion.section>
       </AnimatePresence>
     </main>
