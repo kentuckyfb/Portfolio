@@ -600,7 +600,7 @@ export default function App() {
                           aria-current={current.id === child.id ? 'page' : undefined}
                         >
                           <span className="nav-label-text">
-                            {child.label}
+                            <span className="nav-label-copy">{child.label}</span>
                             {renderActiveBox(child.id, 'child')}
                           </span>
                         </button>
