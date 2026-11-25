@@ -198,6 +198,7 @@ const techCategories: TechCategory[] = [
 ]
 
 const techLibrary = techCategories.flatMap(({ items }) => items)
+const techCategoryPages = [techCategories.slice(0, 4), techCategories.slice(4)]
 const techByName = new Map(techLibrary.map((tech) => [tech.name, tech]))
 const techColor = (name: string) => {
   const tech = techByName.get(name)
@@ -356,19 +357,23 @@ function ProjectsOverview() {
       <header className="empty-state projects-heading">
         <div><h1>Projects</h1><p>Selected work and experiments.</p></div>
       </header>
-      <div className="tech-categories">
-        {techCategories.map(({ label, color, items }) => (
-          <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
-            <h2>{label}</h2>
-            <div className="tech-grid">
-              {items.map(({ name }) => (
-                <div className="tech-app" key={name} title={name} aria-label={name}>
-                  <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
-                  <span>{name}</span>
+      <div className="tech-categories" data-horizontal-scroll>
+        {techCategoryPages.map((categories, pageIndex) => (
+          <div className="tech-category-page" key={pageIndex}>
+            {categories.map(({ label, color, items }) => (
+              <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
+                <h2>{label}</h2>
+                <div className="tech-grid">
+                  {items.map(({ name }) => (
+                    <div className="tech-app" key={name} title={name} aria-label={name}>
+                      <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
+                      <span>{name}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
+              </section>
+            ))}
+          </div>
         ))}
       </div>
     </article>
@@ -381,6 +386,8 @@ export default function App() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const locked = useRef(false)
   const draggingBox = useRef(false)
+  const horizontalWheelLock = useRef(false)
+  const horizontalWheelTimer = useRef<number | null>(null)
   const current = pages[active]
 
   const navigate = useCallback((next: number) => {
@@ -452,6 +459,27 @@ export default function App() {
 
   useEffect(() => {
     const onWheel = (event: WheelEvent) => {
+      const horizontal = (event.target as HTMLElement).closest<HTMLElement>('[data-horizontal-scroll]')
+      if (horizontal && horizontal.scrollWidth > horizontal.clientWidth + 2) {
+        const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
+        const currentPage = Math.round(horizontal.scrollLeft / horizontal.clientWidth)
+        const page = currentPage + Math.sign(delta)
+        if (page >= 0 && page <= 1) {
+          event.preventDefault()
+          if (Math.abs(delta) < 12 || horizontalWheelLock.current) return
+          horizontal.scrollTo({ left: page * horizontal.clientWidth, behavior: 'smooth' })
+        } else if (!horizontalWheelLock.current) {
+          navigate(active + Math.sign(delta))
+          return
+        } else {
+          event.preventDefault()
+          return
+        }
+        horizontalWheelLock.current = true
+        if (horizontalWheelTimer.current !== null) window.clearTimeout(horizontalWheelTimer.current)
+        horizontalWheelTimer.current = window.setTimeout(() => { horizontalWheelLock.current = false }, 520)
+        return
+      }
       const direction = Math.sign(event.deltaY)
       const nested = (event.target as HTMLElement).closest<HTMLElement>('[data-scroll-region]')
       if (nested) {
@@ -473,6 +501,7 @@ export default function App() {
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('keydown', onKey)
     return () => {
+      if (horizontalWheelTimer.current !== null) window.clearTimeout(horizontalWheelTimer.current)
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('keydown', onKey)
     }
