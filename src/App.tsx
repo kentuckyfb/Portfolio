@@ -3,12 +3,19 @@ import { useCallback, useEffect, useRef, useState, type CSSProperties, type Form
 import {
   siCss,
   siAxios,
+  siAndroid,
+  siBaseui,
   siCapacitor,
   siChartdotjs,
   siCplusplus,
+  siCloudflare,
+  siCloudflareworkers,
+  siDocker,
+  siDrizzle,
   siExpress,
   siElectron,
   siFirebase,
+  siFlask,
   siFramer,
   siGithub,
   siGit,
@@ -17,6 +24,10 @@ import {
   siHuggingface,
   siJavascript,
   siJupyter,
+  siJsonwebtokens,
+  siKotlin,
+  siLeaflet,
+  siMongoose,
   siMongodb,
   siMui,
   siNextdotjs,
@@ -24,25 +35,34 @@ import {
   siNumpy,
   siPandas,
   siPlotly,
+  siPostgresql,
   siPwa,
   siPython,
   siPytorch,
   siRadixui,
   siReact,
+  siReacthookform,
   siReactquery,
+  siReactrouter,
   siRedux,
   siSharp,
   siScikitlearn,
   siScrapy,
+  siSpacy,
+  siSqlalchemy,
   siSupabase,
+  siSwiper,
   siTailwindcss,
   siTauri,
   siTensorflow,
   siTypescript,
+  siRust,
   siVercel,
   siVite,
   siUnity,
   siGreensock,
+  siGunicorn,
+  siWeightsandbiases,
   siZod,
   type SimpleIcon,
 } from 'simple-icons'
@@ -113,43 +133,67 @@ const techCategories: TechCategory[] = [
   { label: 'Languages & markup', color: '#f4cf4f', items: [
     { name: 'JavaScript', icon: siJavascript }, { name: 'TypeScript', icon: siTypescript },
     { name: 'Python', icon: siPython }, { name: 'C#', icon: siSharp }, { name: 'C++', icon: siCplusplus },
-    { name: 'HTML', icon: siHtml5 }, { name: 'CSS', icon: siCss },
+    { name: 'Kotlin', icon: siKotlin }, { name: 'Rust', icon: siRust }, { name: 'PowerShell', monogram: 'PS' },
+    { name: 'PL/pgSQL', icon: siPostgresql }, { name: 'HTML', icon: siHtml5 }, { name: 'CSS', icon: siCss },
     { name: 'ShaderLab', monogram: 'SH' }, { name: 'HLSL', monogram: 'HL' },
+    { name: 'Batch', monogram: 'BAT' }, { name: 'Dockerfile', icon: siDocker },
   ] },
   { label: 'Frontend & interface', color: '#ff82ad', items: [
     { name: 'React', icon: siReact }, { name: 'Next.js', icon: siNextdotjs }, { name: 'Vite', icon: siVite },
     { name: 'Tailwind CSS', icon: siTailwindcss }, { name: 'Material UI', icon: siMui }, { name: 'Radix UI', icon: siRadixui },
-    { name: 'Redux', icon: siRedux }, { name: 'TanStack Query', icon: siReactquery }, { name: 'Framer Motion', icon: siFramer },
-    { name: 'GSAP', icon: siGreensock }, { name: 'Chart.js', icon: siChartdotjs }, { name: 'Recharts', icon: siChartdotjs },
-    { name: 'Axios', icon: siAxios }, { name: 'Zod', icon: siZod },
+    { name: 'Base UI', icon: siBaseui }, { name: 'Redux', icon: siRedux }, { name: 'TanStack Query', icon: siReactquery },
+    { name: 'React Router', icon: siReactrouter }, { name: 'React Hook Form', icon: siReacthookform },
+    { name: 'Framer Motion', icon: siFramer }, { name: 'GSAP', icon: siGreensock },
+    { name: 'Chart.js', icon: siChartdotjs }, { name: 'Recharts', icon: siChartdotjs },
+    { name: 'React Flow', monogram: 'RF' }, { name: 'Leaflet', icon: siLeaflet }, { name: 'Swiper', icon: siSwiper },
+    { name: 'Fabric.js', monogram: 'FB' }, { name: 'Embla Carousel', monogram: 'EC' },
+    { name: 'Howler', monogram: 'HW' }, { name: 'Axios', icon: siAxios }, { name: 'Zod', icon: siZod },
   ] },
   { label: 'Backend & APIs', color: '#69aefc', items: [
-    { name: 'Node.js', icon: siNodedotjs }, { name: 'Express', icon: siExpress },
+    { name: 'Node.js', icon: siNodedotjs }, { name: 'Express', icon: siExpress }, { name: 'Flask', icon: siFlask },
+    { name: 'SQLAlchemy', icon: siSqlalchemy }, { name: 'Mongoose', icon: siMongoose },
+    { name: 'JWT', icon: siJsonwebtokens }, { name: 'bcrypt', monogram: 'BC' }, { name: 'Helmet', monogram: 'HM' },
+    { name: 'Nodemailer', monogram: 'NM' }, { name: 'Multer', monogram: 'MU' }, { name: 'Gunicorn', icon: siGunicorn },
     { name: 'Gemini API', icon: siGooglegemini }, { name: 'GitHub API', icon: siGithub },
-    { name: 'Web Audio API', monogram: 'WA' }, { name: 'NHTSA API', monogram: 'NH' }, { name: 'PokeAPI', monogram: 'PO' },
+    { name: 'OpenAI API', monogram: 'AI' }, { name: 'Web Audio API', monogram: 'WA' },
+    { name: 'NHTSA API', monogram: 'NH' }, { name: 'PokeAPI', monogram: 'PO' },
+    { name: 'EmailJS', monogram: 'EM' }, { name: 'NanoHTTPD', monogram: 'NH' },
   ] },
   { label: 'Databases & realtime', color: '#6fcd91', items: [
     { name: 'Supabase', icon: siSupabase }, { name: 'Firebase', icon: siFirebase },
-    { name: 'MongoDB', icon: siMongodb }, { name: 'Ably Realtime', monogram: 'AB' },
+    { name: 'MongoDB', icon: siMongodb }, { name: 'PostgreSQL', icon: siPostgresql },
+    { name: 'Drizzle ORM', icon: siDrizzle }, { name: 'Ably Realtime', monogram: 'AB' },
+    { name: 'Cloudflare D1', icon: siCloudflare },
   ] },
   { label: 'Data & AI', color: '#b58cf3', items: [
     { name: 'Jupyter', icon: siJupyter }, { name: 'TensorFlow', icon: siTensorflow }, { name: 'PyTorch', icon: siPytorch },
     { name: 'scikit-learn', icon: siScikitlearn }, { name: 'Hugging Face', icon: siHuggingface },
-    { name: 'Pandas', icon: siPandas }, { name: 'NumPy', icon: siNumpy }, { name: 'Plotly', icon: siPlotly },
-    { name: 'NLP', icon: siScikitlearn }, { name: 'TF-IDF', icon: siScikitlearn },
-    { name: 'AI image analysis', icon: siTensorflow },
+    { name: 'Transformers', icon: siHuggingface }, { name: 'Pandas', icon: siPandas }, { name: 'NumPy', icon: siNumpy },
+    { name: 'Plotly', icon: siPlotly }, { name: 'spaCy', icon: siSpacy }, { name: 'FAISS', monogram: 'FA' },
+    { name: 'Sentence Transformers', icon: siHuggingface }, { name: 'KeyBERT', monogram: 'KB' },
+    { name: 'Weights & Biases', icon: siWeightsandbiases }, { name: 'Beautiful Soup', monogram: 'BS' },
+    { name: 'NLP', monogram: 'NLP' }, { name: 'TF-IDF', monogram: 'TF' }, { name: 'AI image analysis', icon: siTensorflow },
   ] },
   { label: 'Apps & platforms', color: '#ff9d66', items: [
-    { name: 'Unity', icon: siUnity }, { name: 'Capacitor', icon: siCapacitor },
-    { name: 'Electron', icon: siElectron }, { name: 'Tauri', icon: siTauri },
+    { name: 'Unity', icon: siUnity }, { name: 'Android', icon: siAndroid }, { name: 'CameraX', monogram: 'CX' },
+    { name: 'Capacitor', icon: siCapacitor }, { name: 'Electron', icon: siElectron }, { name: 'Tauri', icon: siTauri },
+    { name: 'Chrome extensions', monogram: 'CE' }, { name: 'PDF.js', monogram: 'PDF' },
+    { name: 'SheetJS / XLSX', monogram: 'XL' }, { name: 'Cloudflare Workers', icon: siCloudflareworkers },
+    { name: 'Vinext', monogram: 'VX' },
   ] },
   { label: 'Hosting & source control', color: '#ff7164', items: [
     { name: 'Vercel', icon: siVercel }, { name: 'Git', icon: siGit }, { name: 'GitHub', icon: siGithub },
+    { name: 'Cloudflare', icon: siCloudflare }, { name: 'Docker', icon: siDocker },
+    { name: 'Wrangler', icon: siCloudflare }, { name: 'Gunicorn hosting', icon: siGunicorn },
   ] },
   { label: 'Methods & standards', color: '#61cbd2', items: [
     { name: 'PWA', icon: siPwa }, { name: 'OAuth', monogram: 'OA' }, { name: 'Web crawling', icon: siScrapy },
     { name: 'Offline-first', monogram: 'OF' }, { name: 'Responsive design', monogram: 'RD' },
     { name: 'REST APIs', monogram: 'API' }, { name: 'Real-time systems', monogram: 'RT' },
+    { name: 'Cache-first', monogram: 'CF' }, { name: 'JWT authentication', icon: siJsonwebtokens },
+    { name: 'Rate limiting', monogram: 'RL' }, { name: 'Sorting algorithms', monogram: 'SA' },
+    { name: 'Recursion', monogram: 'RE' }, { name: 'Web performance', monogram: 'WP' },
+    { name: 'PDF extraction', monogram: 'PX' }, { name: 'Data visualization', icon: siPlotly },
   ] },
 ]
 
@@ -307,27 +351,40 @@ function ContactPage() {
 }
 
 function ProjectsOverview() {
+  const [grouped, setGrouped] = useState(true)
+
   return (
     <article className="projects-overview">
-      <header className="empty-state">
-        <h1>Projects</h1>
-        <p>Selected work and experiments.</p>
+      <header className="empty-state projects-heading">
+        <div><h1>Projects</h1><p>Selected work and experiments.</p></div>
+        <button className={`library-toggle ${grouped ? 'is-grouped' : ''}`} type="button" aria-pressed={grouped} onClick={() => setGrouped((value) => !value)}>
+          <span className="library-toggle-sketch" aria-hidden="true"><i /><i /><i /></span>
+          <span>{grouped ? 'grouped' : 'loose'}</span>
+        </button>
       </header>
-      <div className="tech-categories">
-        {techCategories.map(({ label, color, items }) => (
-          <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
-            <h2>{label}</h2>
-            <div className="tech-grid">
-              {items.map(({ name }) => (
-                <div className="tech-app" key={name} title={name} aria-label={name}>
-                  <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
-                  <span>{name}</span>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
-      </div>
+      {grouped ? (
+        <div className="tech-categories">
+          {techCategories.map(({ label, color, items }) => (
+            <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
+              <h2>{label}</h2>
+              <div className="tech-grid">
+                {items.map(({ name }) => (
+                  <div className="tech-app" key={name} title={name} aria-label={name}>
+                    <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
+                    <span>{name}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
+      ) : (
+        <div className="tech-mix">
+          {techLibrary.map(({ name }) => (
+            <div className="tech-mix-icon" key={name} title={name} aria-label={name} style={{ color: techColor(name) }}><TechMark name={name} /></div>
+          ))}
+        </div>
+      )}
     </article>
   )
 }
