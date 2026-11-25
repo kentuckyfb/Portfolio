@@ -199,10 +199,6 @@ const techCategories: TechCategory[] = [
 
 const techLibrary = techCategories.flatMap(({ items }) => items)
 const techByName = new Map(techLibrary.map((tech) => [tech.name, tech]))
-const TECH_TILE_WIDTH = 960
-const TECH_TILE_HEIGHT = 576
-const techTileCopies = [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]] as const
-const techPlaneItems = Array.from({ length: 128 }, (_, index) => techLibrary[index % techLibrary.length])
 const techColor = (name: string) => {
   const tech = techByName.get(name)
   return !tech?.icon || name === 'Unity' ? '#181817' : `#${tech.icon.hex}`
@@ -355,136 +351,26 @@ function ContactPage() {
 }
 
 function ProjectsOverview() {
-  const [grouped, setGrouped] = useState(true)
-  const plane = useRef<HTMLDivElement | null>(null)
-  const planeOffset = useRef({ x: 0, y: 0 })
-  const planeTiles = useRef<(HTMLDivElement | null)[]>([])
-  const planeIcons = useRef<(HTMLDivElement | null)[]>([])
-  const planeDrag = useRef<{ pointerId: number; x: number; y: number; time: number; velocityX: number; velocityY: number } | null>(null)
-  const inertiaFrame = useRef<number | null>(null)
-
-  useEffect(() => () => {
-    if (inertiaFrame.current !== null) cancelAnimationFrame(inertiaFrame.current)
-  }, [])
-
-  const positionPlane = (x: number, y: number) => {
-    planeOffset.current = { x, y }
-    const wrappedX = ((x % TECH_TILE_WIDTH) + TECH_TILE_WIDTH) % TECH_TILE_WIDTH - TECH_TILE_WIDTH
-    const wrappedY = ((y % TECH_TILE_HEIGHT) + TECH_TILE_HEIGHT) % TECH_TILE_HEIGHT - TECH_TILE_HEIGHT
-    techTileCopies.forEach(([tileX, tileY], index) => {
-      const tile = planeTiles.current[index]
-      if (tile) tile.style.transform = `translate3d(${wrappedX + tileX * TECH_TILE_WIDTH}px, ${wrappedY + tileY * TECH_TILE_HEIGHT}px, 0)`
-
-      techPlaneItems.forEach((_, iconIndex) => {
-        const icon = planeIcons.current[index * techPlaneItems.length + iconIndex]
-        if (!icon || !plane.current) return
-        const column = iconIndex % 16
-        const row = Math.floor(iconIndex / 16)
-        const iconX = wrappedX + tileX * TECH_TILE_WIDTH + column * 60 + 30
-        const iconY = wrappedY + tileY * TECH_TILE_HEIGHT + row * 72 + 36
-        const distance = Math.min(Math.hypot(
-          (iconX - plane.current.clientWidth / 2) / (plane.current.clientWidth * .46),
-          (iconY - plane.current.clientHeight / 2) / (plane.current.clientHeight * .44),
-        ), 1)
-        icon.style.scale = (.48 + Math.pow(1 - distance, 1.35) * 1.28).toFixed(3)
-      })
-    })
-  }
-
-  const toggleGrouping = () => {
-    const update = () => setGrouped((value) => !value)
-    const transitionDocument = document as Document & { startViewTransition?: (callback: () => void) => void }
-    if (transitionDocument.startViewTransition) transitionDocument.startViewTransition(update)
-    else update()
-  }
-
-  useEffect(() => {
-    if (grouped) return
-    const refresh = () => positionPlane(planeOffset.current.x, planeOffset.current.y)
-    const frame = requestAnimationFrame(refresh)
-    window.addEventListener('resize', refresh)
-    return () => {
-      cancelAnimationFrame(frame)
-      window.removeEventListener('resize', refresh)
-    }
-  }, [grouped])
-
-  const startPlane = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (inertiaFrame.current !== null) cancelAnimationFrame(inertiaFrame.current)
-    inertiaFrame.current = null
-    event.currentTarget.setPointerCapture(event.pointerId)
-    planeDrag.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, time: performance.now(), velocityX: 0, velocityY: 0 }
-  }
-
-  const movePlane = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (planeDrag.current?.pointerId !== event.pointerId) return
-    const deltaX = event.clientX - planeDrag.current.x
-    const deltaY = event.clientY - planeDrag.current.y
-    const now = performance.now()
-    const elapsed = Math.max(now - planeDrag.current.time, 8)
-    planeDrag.current.velocityX = planeDrag.current.velocityX * .62 + deltaX / elapsed * .38
-    planeDrag.current.velocityY = planeDrag.current.velocityY * .62 + deltaY / elapsed * .38
-    planeDrag.current.x = event.clientX
-    planeDrag.current.y = event.clientY
-    planeDrag.current.time = now
-    positionPlane(planeOffset.current.x + deltaX, planeOffset.current.y + deltaY)
-  }
-
-  const stopPlane = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (planeDrag.current?.pointerId !== event.pointerId) return
-    let { velocityX, velocityY } = planeDrag.current
-    planeDrag.current = null
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
-    let previous = performance.now()
-    const glide = (now: number) => {
-      const elapsed = Math.min(now - previous, 32)
-      previous = now
-      const friction = Math.pow(.94, elapsed / 16.67)
-      velocityX *= friction
-      velocityY *= friction
-      positionPlane(planeOffset.current.x + velocityX * elapsed, planeOffset.current.y + velocityY * elapsed)
-      if (Math.hypot(velocityX, velocityY) > .015) inertiaFrame.current = requestAnimationFrame(glide)
-      else inertiaFrame.current = null
-    }
-    if (Math.hypot(velocityX, velocityY) > .015) inertiaFrame.current = requestAnimationFrame(glide)
-  }
-
   return (
-    <article className={`projects-overview ${grouped ? 'is-grouped' : 'is-loose'}`}>
+    <article className="projects-overview">
       <header className="empty-state projects-heading">
         <div><h1>Projects</h1><p>Selected work and experiments.</p></div>
-        <button className={`library-toggle ${grouped ? 'is-grouped' : ''}`} type="button" aria-pressed={grouped} onClick={toggleGrouping}>
-          <span className="library-toggle-sketch" aria-hidden="true"><i /><i /><i /></span>
-          <span>{grouped ? 'grouped' : 'loose'}</span>
-        </button>
       </header>
-      {grouped ? (
-        <div className="tech-categories">
-          {techCategories.map(({ label, color, items }) => (
-            <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
-              <h2>{label}</h2>
-              <div className="tech-grid">
-                {items.map(({ name }) => (
-                  <div className="tech-app" key={name} title={name} aria-label={name} style={{ viewTransitionName: `tech-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` }}>
-                    <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
-                    <span>{name}</span>
-                  </div>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      ) : (
-        <div className="tech-plane" ref={plane} onPointerDown={startPlane} onPointerMove={movePlane} onPointerUp={stopPlane} onPointerCancel={stopPlane}>
-          {techTileCopies.map(([tileX, tileY], tileIndex) => (
-            <div className="tech-plane-tile" key={`${tileX}-${tileY}`} ref={(node) => { planeTiles.current[tileIndex] = node }} aria-hidden={tileX !== 1 || tileY !== 1} style={{ transform: `translate3d(${(tileX - 1) * TECH_TILE_WIDTH}px, ${(tileY - 1) * TECH_TILE_HEIGHT}px, 0)` }}>
-              {techPlaneItems.map(({ name }, index) => (
-                <div className="tech-plane-icon" key={`${name}-${index}`} ref={(node) => { planeIcons.current[tileIndex * techPlaneItems.length + index] = node }} title={name} role="img" aria-label={name} style={{ color: techColor(name), viewTransitionName: tileX === 1 && tileY === 1 && index < techLibrary.length ? `tech-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : 'none' }}><TechMark name={name} /><span>{name}</span></div>
+      <div className="tech-categories">
+        {techCategories.map(({ label, color, items }) => (
+          <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
+            <h2>{label}</h2>
+            <div className="tech-grid">
+              {items.map(({ name }) => (
+                <div className="tech-app" key={name} title={name} aria-label={name}>
+                  <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
+                  <span>{name}</span>
+                </div>
               ))}
             </div>
-          ))}
-        </div>
-      )}
+          </section>
+        ))}
+      </div>
     </article>
   )
 }

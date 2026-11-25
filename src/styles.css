@@ -210,20 +210,11 @@ button { color: inherit; font: inherit; }
 
 .stage-projects { width: min(1100px, calc(100% - 48px)); }
 .projects-overview { position: relative; isolation: isolate; display: grid; grid-template-rows: auto minmax(0, 1fr); gap: clamp(12px, 2vh, 22px); width: min(940px, 100%); height: 92dvh; overflow: hidden; }
-.projects-overview.is-loose { gap: 0; }
 .projects-overview::before { position: absolute; z-index: -1; inset: 0; content: ''; background-image: linear-gradient(rgba(24, 24, 23, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(24, 24, 23, .055) 1px, transparent 1px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(ellipse 46% 44% at 50% 46%, #000 18%, rgba(0, 0, 0, .7) 48%, transparent 100%); mask-image: radial-gradient(ellipse 46% 44% at 50% 46%, #000 18%, rgba(0, 0, 0, .7) 48%, transparent 100%); pointer-events: none; }
 .projects-overview .empty-state h1 { font-size: clamp(3.5rem, 7vw, 6.5rem); }
 .projects-overview .empty-state > p:last-child { margin-top: 10px; }
-.projects-heading { display: flex; align-items: end; justify-content: space-between; gap: 30px; max-width: none; }
+.projects-heading { max-width: none; }
 .projects-heading > div > p { margin: 10px 0 0; color: var(--muted); font-family: 'Kalam', cursive; font-size: clamp(1.1rem, 2vw, 1.5rem); }
-.library-toggle { display: inline-flex; width: 112px; align-items: center; gap: 8px; margin: 0 8px 5px 0; padding: 5px 2px; color: var(--muted); font: 600 1rem/1 'Caveat Variable', cursive; background: none; border: 0; cursor: pointer; transform: rotate(-2deg); }
-.library-toggle:hover { color: var(--ink); }
-.library-toggle-sketch { position: relative; display: block; width: 42px; height: 17px; }
-.library-toggle-sketch i { position: absolute; left: 0; width: 29px; height: 1px; background: currentColor; transition: translate .35s cubic-bezier(.22, 1, .36, 1), rotate .35s cubic-bezier(.22, 1, .36, 1); }
-.library-toggle-sketch i:nth-child(1) { top: 2px; translate: 10px 0; rotate: 3deg; }
-.library-toggle-sketch i:nth-child(2) { top: 8px; translate: 0 0; rotate: -2deg; }
-.library-toggle-sketch i:nth-child(3) { top: 14px; translate: 7px 0; rotate: 1deg; }
-.library-toggle.is-grouped .library-toggle-sketch i { translate: 6px 0; rotate: 0deg; }
 .tech-categories { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2.4vh, 28px) 14px; height: 100%; padding: 22px 8px 24px; overflow: hidden; align-content: start; }
 .tech-category { position: relative; isolation: isolate; z-index: 0; min-width: 0; padding: 6px 5px 10px; }
 .tech-category h2 { position: relative; z-index: 2; width: fit-content; margin: 0 0 15px; font: 650 clamp(1.2rem, 1.55vw, 1.5rem)/.92 'Caveat Variable', cursive; letter-spacing: -.015em; transform: rotate(-3deg) translateY(-2px); transform-origin: left center; animation: category-title-in .55s cubic-bezier(.22, 1, .36, 1) both; }
@@ -244,19 +235,6 @@ button { color: inherit; font: inherit; }
 .tech-app-icon svg, .tech-app-icon .tech-fallback { width: 24px; height: 24px; }
 .tech-app-icon svg { fill: currentColor; }
 .tech-app > span { width: 100%; min-height: 2.2em; color: #686761; font-size: .56rem; line-height: 1.15; }
-.tech-plane { position: relative; height: calc(100% + 34px); margin-top: -34px; overflow: hidden; cursor: grab; touch-action: none; user-select: none; -webkit-mask-image: radial-gradient(ellipse 46% 44% at 50% 46%, #000 18%, rgba(0, 0, 0, .7) 48%, transparent 100%); mask-image: radial-gradient(ellipse 46% 44% at 50% 46%, #000 18%, rgba(0, 0, 0, .7) 48%, transparent 100%); }
-.tech-plane:active { cursor: grabbing; }
-.tech-plane-tile { position: absolute; top: 0; left: 0; display: grid; grid-template: repeat(8, 72px) / repeat(16, 60px); width: 960px; height: 576px; will-change: transform; }
-.tech-plane-icon { display: grid; gap: 3px; place-items: center; align-content: center; min-width: 0; text-align: center; will-change: scale; animation: plane-icon-in .45s cubic-bezier(.22, 1, .36, 1) both; }
-.tech-plane-icon:nth-child(2n) { animation-delay: .025s; }
-.tech-plane-icon:nth-child(3n) { animation-delay: .05s; }
-.tech-plane-icon:nth-child(5n) { animation-delay: .075s; }
-.tech-plane-icon svg, .tech-plane-icon .tech-fallback { width: 21px; height: 21px; }
-.tech-plane-icon svg { fill: currentColor; }
-.tech-plane-icon > span:last-child { width: 100%; overflow: hidden; color: #686761; font-size: .48rem; line-height: 1.1; text-overflow: ellipsis; white-space: nowrap; }
-@keyframes plane-icon-in { from { opacity: 0; transform: translateY(5px); } }
-::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
-::view-transition-group(*) { animation-duration: .8s; animation-timing-function: cubic-bezier(.22, 1, .36, 1); }
 
 @media (max-width: 720px) {
   .explorer { top: 14px; left: 12px; width: calc(100vw - 24px); padding: 7px; background: rgba(246, 245, 239, .9); border: 1px solid var(--line); border-radius: 9px; backdrop-filter: blur(14px); }
@@ -286,21 +264,14 @@ button { color: inherit; font: inherit; }
   .contact-form textarea { max-height: 76px; }
   .stage-projects { padding-top: 110px; }
   .projects-overview { gap: 10px; height: calc(100dvh - 118px); }
-  .projects-overview.is-loose { gap: 0; }
   .projects-overview .empty-state h1 { font-size: clamp(3rem, 14vw, 4.5rem); }
   .projects-overview .empty-state > p:last-child { margin-top: 6px; font-size: .9rem; }
-  .projects-heading { align-items: center; }
-  .library-toggle { margin: 0; font-size: .85rem; }
-  .library-toggle-sketch { width: 34px; transform: scale(.85); }
   .tech-categories { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 5px; padding: 12px 0; }
   .tech-category { padding: 4px 2px 7px; }
   .tech-category h2 { margin-bottom: 10px; font-size: clamp(1.05rem, 4.2vw, 1.25rem); }
   .tech-grid { gap: 8px 2px; }
   .tech-app-icon svg, .tech-app-icon .tech-fallback { width: 18px; height: 18px; }
   .tech-app > span { min-height: 2em; font-size: .46rem; }
-  .tech-plane { height: calc(100% + 18px); margin-top: -18px; }
-  .tech-plane-icon svg, .tech-plane-icon .tech-fallback { width: 17px; height: 17px; }
-  .tech-plane-icon > span:last-child { font-size: .4rem; }
   .write-in { font-size: clamp(3.7rem, 18vw, 6rem); white-space: normal; }
 }
 
