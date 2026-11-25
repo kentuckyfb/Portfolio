@@ -213,15 +213,15 @@ button { color: inherit; font: inherit; }
 .tech-categories { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2.4vh, 28px) 14px; padding: 22px 8px 24px; }
 .tech-categories::before { position: absolute; z-index: -1; inset: -28px -34px; content: ''; background-image: linear-gradient(rgba(24, 24, 23, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(24, 24, 23, .055) 1px, transparent 1px); background-size: 22px 22px; mask-image: radial-gradient(ellipse at center, #000 42%, rgba(0, 0, 0, .82) 64%, transparent 88%); pointer-events: none; }
 .tech-category { position: relative; isolation: isolate; z-index: 0; min-width: 0; padding: 6px 5px 10px; }
-.tech-category::before, .tech-category::after { position: absolute; z-index: 0; content: ''; opacity: .16; background: var(--category-color); pointer-events: none; }
-.tech-category::before { top: 19%; left: -2%; width: 94%; height: 39%; clip-path: polygon(0 9%, 12% 2%, 36% 8%, 64% 0, 100% 12%, 97% 88%, 70% 96%, 34% 89%, 2% 100%); transform: rotate(-1.8deg); }
-.tech-category::after { top: 57%; right: -3%; width: 86%; height: 32%; clip-path: polygon(2% 3%, 24% 10%, 48% 0, 75% 9%, 100% 2%, 96% 92%, 63% 84%, 29% 100%, 0 88%); transform: rotate(1.3deg); }
-.tech-category:nth-child(3n + 1)::before { top: 25%; left: 5%; width: 88%; height: 42%; transform: rotate(2.1deg); }
-.tech-category:nth-child(3n + 1)::after { top: 62%; right: 4%; width: 78%; height: 29%; transform: rotate(-2.4deg); }
-.tech-category:nth-child(3n + 2)::before { top: 15%; left: 8%; width: 96%; height: 37%; transform: rotate(-.7deg); }
-.tech-category:nth-child(3n + 2)::after { top: 51%; right: 8%; width: 89%; height: 35%; transform: rotate(2.8deg); }
-.tech-category:nth-child(4n)::before { top: 31%; left: -7%; width: 81%; height: 44%; transform: rotate(-3.2deg); }
-.tech-category:nth-child(4n)::after { top: 68%; right: -8%; width: 92%; height: 25%; transform: rotate(.4deg); }
+.tech-category::before, .tech-category::after { position: absolute; z-index: 0; content: ''; opacity: .18; pointer-events: none; }
+.tech-category::before { top: 18%; left: -2%; width: 96%; height: 76%; background: repeating-linear-gradient(177deg, var(--category-color) 0 12px, transparent 13px 39px); clip-path: polygon(0 3%, 12% 0, 38% 2%, 66% 0, 100% 4%, 97% 96%, 70% 99%, 34% 96%, 2% 100%); transform: rotate(-1.3deg); }
+.tech-category::after { top: 27%; right: -3%; width: 84%; height: 62%; background: repeating-linear-gradient(183deg, var(--category-color) 0 10px, transparent 11px 47px); clip-path: polygon(2% 1%, 24% 4%, 49% 0, 76% 3%, 100% 1%, 96% 97%, 63% 94%, 29% 100%, 0 96%); transform: rotate(1.6deg); }
+.tech-category:nth-child(3n + 1)::before { top: 21%; left: 5%; width: 90%; height: 72%; transform: rotate(2.1deg); }
+.tech-category:nth-child(3n + 1)::after { top: 32%; right: 4%; width: 78%; height: 58%; transform: rotate(-2.4deg); }
+.tech-category:nth-child(3n + 2)::before { top: 14%; left: 7%; width: 96%; height: 79%; transform: rotate(-.7deg); }
+.tech-category:nth-child(3n + 2)::after { top: 25%; right: 8%; width: 88%; height: 66%; transform: rotate(2.8deg); }
+.tech-category:nth-child(4n)::before { top: 20%; left: -7%; width: 84%; height: 74%; transform: rotate(-3.2deg); }
+.tech-category:nth-child(4n)::after { top: 34%; right: -8%; width: 92%; height: 56%; transform: rotate(.4deg); }
 .tech-category h2 { position: relative; z-index: 2; width: fit-content; margin: 0 0 15px; font: 650 clamp(1.2rem, 1.55vw, 1.5rem)/.92 'Caveat Variable', cursive; letter-spacing: -.015em; transform: rotate(-3deg) translateY(-2px); transform-origin: left center; }
 .tech-category h2::before { position: absolute; z-index: -1; inset: 43% -8px 2px; content: ''; opacity: .44; background: var(--category-color); clip-path: polygon(0 28%, 14% 8%, 43% 21%, 71% 0, 100% 19%, 96% 83%, 59% 69%, 27% 100%, 3% 78%); transform: rotate(-1.7deg); }
 .tech-category:nth-child(even) h2::before { inset-inline: -5px -13px; clip-path: polygon(1% 5%, 30% 19%, 56% 0, 100% 26%, 96% 91%, 68% 72%, 33% 100%, 0 74%); transform: rotate(1.4deg); }
