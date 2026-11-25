@@ -386,9 +386,16 @@ function ProjectsOverview() {
           (iconX - plane.current.clientWidth / 2) / (plane.current.clientWidth * .46),
           (iconY - plane.current.clientHeight / 2) / (plane.current.clientHeight * .44),
         ), 1)
-        icon.style.scale = (.52 + Math.pow(1 - distance, 1.45) * .84).toFixed(3)
+        icon.style.scale = (.48 + Math.pow(1 - distance, 1.35) * 1.28).toFixed(3)
       })
     })
+  }
+
+  const toggleGrouping = () => {
+    const update = () => setGrouped((value) => !value)
+    const transitionDocument = document as Document & { startViewTransition?: (callback: () => void) => void }
+    if (transitionDocument.startViewTransition) transitionDocument.startViewTransition(update)
+    else update()
   }
 
   useEffect(() => {
@@ -443,10 +450,10 @@ function ProjectsOverview() {
   }
 
   return (
-    <article className="projects-overview">
+    <article className={`projects-overview ${grouped ? 'is-grouped' : 'is-loose'}`}>
       <header className="empty-state projects-heading">
         <div><h1>Projects</h1><p>Selected work and experiments.</p></div>
-        <button className={`library-toggle ${grouped ? 'is-grouped' : ''}`} type="button" aria-pressed={grouped} onClick={() => setGrouped((value) => !value)}>
+        <button className={`library-toggle ${grouped ? 'is-grouped' : ''}`} type="button" aria-pressed={grouped} onClick={toggleGrouping}>
           <span className="library-toggle-sketch" aria-hidden="true"><i /><i /><i /></span>
           <span>{grouped ? 'grouped' : 'loose'}</span>
         </button>
@@ -458,7 +465,7 @@ function ProjectsOverview() {
               <h2>{label}</h2>
               <div className="tech-grid">
                 {items.map(({ name }) => (
-                  <div className="tech-app" key={name} title={name} aria-label={name}>
+                  <div className="tech-app" key={name} title={name} aria-label={name} style={{ viewTransitionName: `tech-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` }}>
                     <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
                     <span>{name}</span>
                   </div>
@@ -472,7 +479,7 @@ function ProjectsOverview() {
           {techTileCopies.map(([tileX, tileY], tileIndex) => (
             <div className="tech-plane-tile" key={`${tileX}-${tileY}`} ref={(node) => { planeTiles.current[tileIndex] = node }} aria-hidden={tileX !== 1 || tileY !== 1} style={{ transform: `translate3d(${(tileX - 1) * TECH_TILE_WIDTH}px, ${(tileY - 1) * TECH_TILE_HEIGHT}px, 0)` }}>
               {techPlaneItems.map(({ name }, index) => (
-                <div className="tech-plane-icon" key={`${name}-${index}`} ref={(node) => { planeIcons.current[tileIndex * techPlaneItems.length + index] = node }} title={name} role="img" aria-label={name} style={{ color: techColor(name) }}><TechMark name={name} /><span>{name}</span></div>
+                <div className="tech-plane-icon" key={`${name}-${index}`} ref={(node) => { planeIcons.current[tileIndex * techPlaneItems.length + index] = node }} title={name} role="img" aria-label={name} style={{ color: techColor(name), viewTransitionName: tileX === 1 && tileY === 1 && index < techLibrary.length ? `tech-${name.toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : 'none' }}><TechMark name={name} /><span>{name}</span></div>
               ))}
             </div>
           ))}
