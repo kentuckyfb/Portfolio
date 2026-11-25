@@ -456,8 +456,10 @@ export default function App() {
                   aria-current={current.id === group.id ? 'page' : undefined}
                   aria-expanded={group.timeline ? open : undefined}
                 >
-                  {group.label}
-                  {renderActiveBox(navKey, 'main')}
+                  <span className="nav-label-text">
+                    {group.label}
+                    {renderActiveBox(navKey, 'main')}
+                  </span>
                 </button>
 
                 <AnimatePresence initial={false}>
@@ -478,8 +480,10 @@ export default function App() {
                           onClick={() => navigateTo(child.id)}
                           aria-current={current.id === child.id ? 'page' : undefined}
                         >
-                          {child.label}
-                          {renderActiveBox(child.id, 'child')}
+                          <span className="nav-label-text">
+                            {child.label}
+                            {renderActiveBox(child.id, 'child')}
+                          </span>
                         </button>
                       ))}
                     </motion.div>
