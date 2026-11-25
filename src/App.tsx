@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent as ReactPointerEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type CSSProperties, type FormEvent, type PointerEvent as ReactPointerEvent, type WheelEvent as ReactWheelEvent } from 'react'
 import {
   siCss,
   siAxios,
@@ -198,7 +198,6 @@ const techCategories: TechCategory[] = [
 ]
 
 const techLibrary = techCategories.flatMap(({ items }) => items)
-const techCategoryPages = [techCategories.slice(0, 4), techCategories.slice(4)]
 const techByName = new Map(techLibrary.map((tech) => [tech.name, tech]))
 const techColor = (name: string) => {
   const tech = techByName.get(name)
@@ -352,12 +351,24 @@ function ContactPage() {
 }
 
 function ProjectsOverview() {
-  const [techPage, setTechPage] = useState(0)
-  const techRail = useRef<HTMLDivElement | null>(null)
+  const [activeCategory, setActiveCategory] = useState(0)
+  const categoryWheelLock = useRef(false)
+  const categoryWheelTimer = useRef<number | null>(null)
 
-  const showTechPage = (page: number) => {
-    const rail = techRail.current
-    if (rail) rail.scrollTo({ left: page * rail.clientWidth, behavior: 'smooth' })
+  useEffect(() => () => {
+    if (categoryWheelTimer.current !== null) window.clearTimeout(categoryWheelTimer.current)
+  }, [])
+
+  const moveCategory = (event: ReactWheelEvent<HTMLDivElement>) => {
+    if (Math.abs(event.deltaY) < 12) return
+    const next = Math.max(0, Math.min(techCategories.length - 1, activeCategory + Math.sign(event.deltaY)))
+    if (next === activeCategory) return
+    event.preventDefault()
+    event.stopPropagation()
+    if (categoryWheelLock.current) return
+    categoryWheelLock.current = true
+    setActiveCategory(next)
+    categoryWheelTimer.current = window.setTimeout(() => { categoryWheelLock.current = false }, 420)
   }
 
   return (
@@ -365,27 +376,35 @@ function ProjectsOverview() {
       <header className="empty-state projects-heading">
         <div><h1>Projects</h1><p>Selected work and experiments.</p></div>
       </header>
-      <div className="tech-categories" ref={techRail} data-horizontal-scroll onScroll={(event) => setTechPage(Math.round(event.currentTarget.scrollLeft / event.currentTarget.clientWidth))}>
-        {techCategoryPages.map((categories, pageIndex) => (
-          <div className="tech-category-page" key={pageIndex}>
-            {categories.map(({ label, color, items }) => (
-              <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
-                <h2>{label}</h2>
-                <div className="tech-grid">
-                  {items.map(({ name }) => (
-                    <div className="tech-app" key={name} title={name} aria-label={name}>
-                      <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
-                      <span>{name}</span>
-                    </div>
-                  ))}
+      <div className="tech-categories">
+        {techCategories.map(({ label, color, items }) => (
+          <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
+            <h2>{label}</h2>
+            <div className="tech-grid">
+              {items.map(({ name }) => (
+                <div className="tech-app" key={name} title={name} aria-label={name}>
+                  <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
+                  <span>{name}</span>
                 </div>
-              </section>
-            ))}
-          </div>
+              ))}
+            </div>
+          </section>
         ))}
       </div>
-      <div className="tech-slider-indicator" aria-label="Technology groups">
-        {[0, 1].map((page) => <button className={techPage === page ? 'is-active' : ''} type="button" key={page} aria-label={`Show technology group ${page + 1}`} aria-current={techPage === page ? 'true' : undefined} onClick={() => showTechPage(page)} />)}
+      <div className="tech-compact" onWheel={moveCategory}>
+        <div className="tech-compact-nav" role="tablist" aria-label="Technology categories">
+          {techCategories.map(({ label, color }, index) => <button className={activeCategory === index ? 'is-active' : ''} type="button" role="tab" aria-selected={activeCategory === index} style={{ '--category-color': color } as CSSProperties} key={label} onClick={() => setActiveCategory(index)}>{label}</button>)}
+        </div>
+        <AnimatePresence mode="wait">
+          <motion.div className="tech-compact-panel" key={techCategories[activeCategory].label} role="tabpanel" initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: .24, ease: [0.22, 1, 0.36, 1] }}>
+            {techCategories[activeCategory].items.map(({ name }) => (
+              <div className="tech-app" key={name} title={name} aria-label={name}>
+                <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
+                <span>{name}</span>
+              </div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </article>
   )
@@ -397,8 +416,6 @@ export default function App() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const locked = useRef(false)
   const draggingBox = useRef(false)
-  const horizontalWheelLock = useRef(false)
-  const horizontalWheelTimer = useRef<number | null>(null)
   const current = pages[active]
 
   const navigate = useCallback((next: number) => {
@@ -470,27 +487,6 @@ export default function App() {
 
   useEffect(() => {
     const onWheel = (event: WheelEvent) => {
-      const horizontal = (event.target as HTMLElement).closest<HTMLElement>('[data-horizontal-scroll]')
-      if (horizontal && horizontal.scrollWidth > horizontal.clientWidth + 2) {
-        const delta = Math.abs(event.deltaY) >= Math.abs(event.deltaX) ? event.deltaY : event.deltaX
-        const currentPage = Math.round(horizontal.scrollLeft / horizontal.clientWidth)
-        const page = currentPage + Math.sign(delta)
-        if (page >= 0 && page <= 1) {
-          event.preventDefault()
-          if (Math.abs(delta) < 12 || horizontalWheelLock.current) return
-          horizontal.scrollTo({ left: page * horizontal.clientWidth, behavior: 'smooth' })
-        } else if (!horizontalWheelLock.current) {
-          navigate(active + Math.sign(delta))
-          return
-        } else {
-          event.preventDefault()
-          return
-        }
-        horizontalWheelLock.current = true
-        if (horizontalWheelTimer.current !== null) window.clearTimeout(horizontalWheelTimer.current)
-        horizontalWheelTimer.current = window.setTimeout(() => { horizontalWheelLock.current = false }, 520)
-        return
-      }
       const direction = Math.sign(event.deltaY)
       const nested = (event.target as HTMLElement).closest<HTMLElement>('[data-scroll-region]')
       if (nested) {
@@ -512,7 +508,6 @@ export default function App() {
     window.addEventListener('wheel', onWheel, { passive: false })
     window.addEventListener('keydown', onKey)
     return () => {
-      if (horizontalWheelTimer.current !== null) window.clearTimeout(horizontalWheelTimer.current)
       window.removeEventListener('wheel', onWheel)
       window.removeEventListener('keydown', onKey)
     }
