@@ -284,7 +284,7 @@ button { color: inherit; font: inherit; }
   .projects-overview { gap: clamp(8px, 1.2vh, 14px); }
   .tech-categories { display: none; }
   .tech-compact { display: grid; grid-template-columns: minmax(165px, .32fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 52px); min-height: 0; padding: 12px 8px 22px; overflow: hidden; }
-  .tech-compact-nav { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: clamp(7px, 1.2vh, 13px); min-width: 0; }
+  .tech-compact-nav { display: flex; flex-direction: column; align-items: flex-start; justify-content: flex-start; gap: clamp(7px, 1.2vh, 13px); min-width: 0; padding-top: 6px; }
   .tech-compact-nav button { position: relative; isolation: isolate; padding: 3px 5px; color: var(--muted); font: 600 clamp(1rem, 1.8vw, 1.35rem)/1 'Caveat Variable', cursive; text-align: left; background: none; border: 0; cursor: pointer; transition: color .2s ease; }
   .tech-compact-nav button::before { position: absolute; z-index: -1; inset: 45% -7px 0; content: ''; opacity: 0; background: var(--category-color); clip-path: polygon(0 28%, 15% 5%, 43% 18%, 73% 0, 100% 21%, 96% 83%, 60% 68%, 28% 100%, 3% 77%); transform: rotate(-1.5deg); transition: opacity .2s ease; }
   .tech-compact-nav button.is-active { color: var(--ink); }
