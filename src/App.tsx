@@ -356,8 +356,10 @@ function ContactPage() {
 
 function ProjectsOverview() {
   const [grouped, setGrouped] = useState(true)
+  const plane = useRef<HTMLDivElement | null>(null)
   const planeOffset = useRef({ x: 0, y: 0 })
   const planeTiles = useRef<(HTMLDivElement | null)[]>([])
+  const planeIcons = useRef<(HTMLDivElement | null)[]>([])
   const planeDrag = useRef<{ pointerId: number; x: number; y: number; time: number; velocityX: number; velocityY: number } | null>(null)
   const inertiaFrame = useRef<number | null>(null)
 
@@ -372,8 +374,33 @@ function ProjectsOverview() {
     techTileCopies.forEach(([tileX, tileY], index) => {
       const tile = planeTiles.current[index]
       if (tile) tile.style.transform = `translate3d(${wrappedX + tileX * TECH_TILE_WIDTH}px, ${wrappedY + tileY * TECH_TILE_HEIGHT}px, 0)`
+
+      techPlaneItems.forEach((_, iconIndex) => {
+        const icon = planeIcons.current[index * techPlaneItems.length + iconIndex]
+        if (!icon || !plane.current) return
+        const column = iconIndex % 16
+        const row = Math.floor(iconIndex / 16)
+        const iconX = wrappedX + tileX * TECH_TILE_WIDTH + column * 60 + 30
+        const iconY = wrappedY + tileY * TECH_TILE_HEIGHT + row * 72 + 36
+        const distance = Math.min(Math.hypot(
+          (iconX - plane.current.clientWidth / 2) / (plane.current.clientWidth * .46),
+          (iconY - plane.current.clientHeight / 2) / (plane.current.clientHeight * .44),
+        ), 1)
+        icon.style.scale = (.52 + Math.pow(1 - distance, 1.45) * .84).toFixed(3)
+      })
     })
   }
+
+  useEffect(() => {
+    if (grouped) return
+    const refresh = () => positionPlane(planeOffset.current.x, planeOffset.current.y)
+    const frame = requestAnimationFrame(refresh)
+    window.addEventListener('resize', refresh)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('resize', refresh)
+    }
+  }, [grouped])
 
   const startPlane = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (inertiaFrame.current !== null) cancelAnimationFrame(inertiaFrame.current)
@@ -441,11 +468,11 @@ function ProjectsOverview() {
           ))}
         </div>
       ) : (
-        <div className="tech-plane" onPointerDown={startPlane} onPointerMove={movePlane} onPointerUp={stopPlane} onPointerCancel={stopPlane}>
+        <div className="tech-plane" ref={plane} onPointerDown={startPlane} onPointerMove={movePlane} onPointerUp={stopPlane} onPointerCancel={stopPlane}>
           {techTileCopies.map(([tileX, tileY], tileIndex) => (
             <div className="tech-plane-tile" key={`${tileX}-${tileY}`} ref={(node) => { planeTiles.current[tileIndex] = node }} aria-hidden={tileX !== 1 || tileY !== 1} style={{ transform: `translate3d(${(tileX - 1) * TECH_TILE_WIDTH}px, ${(tileY - 1) * TECH_TILE_HEIGHT}px, 0)` }}>
               {techPlaneItems.map(({ name }, index) => (
-                <div className="tech-plane-icon" key={`${name}-${index}`} title={name} role="img" aria-label={name} style={{ color: techColor(name) }}><TechMark name={name} /><span>{name}</span></div>
+                <div className="tech-plane-icon" key={`${name}-${index}`} ref={(node) => { planeIcons.current[tileIndex * techPlaneItems.length + index] = node }} title={name} role="img" aria-label={name} style={{ color: techColor(name) }}><TechMark name={name} /><span>{name}</span></div>
               ))}
             </div>
           ))}
