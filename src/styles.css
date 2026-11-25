@@ -285,9 +285,9 @@ button { color: inherit; font: inherit; }
   .tech-categories { display: none; }
   .tech-compact { display: grid; grid-template-columns: minmax(165px, .32fr) minmax(0, 1fr); gap: clamp(20px, 4vw, 52px); min-height: 0; padding: 12px 8px 22px; overflow: hidden; }
   .tech-compact-nav { display: flex; flex-direction: column; align-items: flex-start; justify-content: center; gap: clamp(7px, 1.2vh, 13px); min-width: 0; }
-  .tech-compact-nav button { position: relative; isolation: isolate; padding: 3px 5px; color: var(--muted); font: 600 clamp(1rem, 1.8vw, 1.35rem)/1 'Caveat Variable', cursive; text-align: left; background: none; border: 0; cursor: pointer; transition: color .2s ease, translate .3s cubic-bezier(.22, 1, .36, 1); }
+  .tech-compact-nav button { position: relative; isolation: isolate; padding: 3px 5px; color: var(--muted); font: 600 clamp(1rem, 1.8vw, 1.35rem)/1 'Caveat Variable', cursive; text-align: left; background: none; border: 0; cursor: pointer; transition: color .2s ease; }
   .tech-compact-nav button::before { position: absolute; z-index: -1; inset: 45% -7px 0; content: ''; opacity: 0; background: var(--category-color); clip-path: polygon(0 28%, 15% 5%, 43% 18%, 73% 0, 100% 21%, 96% 83%, 60% 68%, 28% 100%, 3% 77%); transform: rotate(-1.5deg); transition: opacity .2s ease; }
-  .tech-compact-nav button.is-active { color: var(--ink); translate: 8px 0; }
+  .tech-compact-nav button.is-active { color: var(--ink); }
   .tech-compact-nav button.is-active::before { opacity: .44; }
   .tech-compact-panel { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); grid-auto-rows: 72px; gap: 0 8px; align-content: start; align-items: start; min-width: 0; padding-top: 6px; }
   .tech-compact-panel .tech-app { height: 72px; align-content: start; }
