@@ -209,17 +209,18 @@ button { color: inherit; font: inherit; }
 .stage-projects { width: min(1050px, calc(100% - 48px)); }
 .projects-overview { display: grid; gap: clamp(30px, 5vh, 52px); width: min(860px, 100%); max-height: 86dvh; overflow-y: auto; scrollbar-width: none; }
 .projects-overview::-webkit-scrollbar { display: none; }
-.tech-categories { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px 28px; padding: 34px 20px 38px; background-image: linear-gradient(rgba(24, 24, 23, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(24, 24, 23, .055) 1px, transparent 1px); background-size: 22px 22px; }
-.tech-category { position: relative; isolation: isolate; min-width: 0; padding: 10px 12px 24px; }
+.tech-categories { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 44px 28px; padding: 34px 20px 38px; }
+.tech-categories::before { position: absolute; z-index: -1; inset: -28px -34px; content: ''; background-image: linear-gradient(rgba(24, 24, 23, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(24, 24, 23, .055) 1px, transparent 1px); background-size: 22px 22px; mask-image: radial-gradient(ellipse at center, #000 42%, rgba(0, 0, 0, .82) 64%, transparent 88%); pointer-events: none; }
+.tech-category { position: relative; isolation: isolate; z-index: 0; min-width: 0; padding: 10px 12px 24px; }
 .tech-category::before, .tech-category::after { position: absolute; z-index: 0; content: ''; opacity: .16; background: var(--category-color); pointer-events: none; }
-.tech-category::before { top: 27%; left: -2%; width: 91%; height: 28px; clip-path: polygon(0 22%, 11% 7%, 37% 17%, 66% 0, 100% 24%, 97% 76%, 69% 91%, 31% 73%, 3% 100%); transform: rotate(-1.8deg); }
-.tech-category::after { top: 67%; right: -3%; width: 76%; height: 23px; clip-path: polygon(2% 8%, 23% 17%, 49% 0, 74% 19%, 100% 5%, 96% 86%, 62% 72%, 28% 100%, 0 79%); transform: rotate(1.3deg); }
-.tech-category:nth-child(3n + 1)::before { top: 34%; left: 5%; width: 82%; transform: rotate(2.1deg); }
-.tech-category:nth-child(3n + 1)::after { top: 76%; right: 4%; width: 69%; transform: rotate(-2.4deg); }
-.tech-category:nth-child(3n + 2)::before { top: 22%; left: 11%; width: 94%; transform: rotate(-.7deg); }
-.tech-category:nth-child(3n + 2)::after { top: 58%; right: 8%; width: 83%; transform: rotate(2.8deg); }
-.tech-category:nth-child(4n)::before { top: 43%; left: -7%; width: 73%; transform: rotate(-3.2deg); }
-.tech-category:nth-child(4n)::after { top: 81%; right: -8%; width: 88%; transform: rotate(.4deg); }
+.tech-category::before { top: 19%; left: -2%; width: 94%; height: 39%; clip-path: polygon(0 9%, 12% 2%, 36% 8%, 64% 0, 100% 12%, 97% 88%, 70% 96%, 34% 89%, 2% 100%); transform: rotate(-1.8deg); }
+.tech-category::after { top: 57%; right: -3%; width: 86%; height: 32%; clip-path: polygon(2% 3%, 24% 10%, 48% 0, 75% 9%, 100% 2%, 96% 92%, 63% 84%, 29% 100%, 0 88%); transform: rotate(1.3deg); }
+.tech-category:nth-child(3n + 1)::before { top: 25%; left: 5%; width: 88%; height: 42%; transform: rotate(2.1deg); }
+.tech-category:nth-child(3n + 1)::after { top: 62%; right: 4%; width: 78%; height: 29%; transform: rotate(-2.4deg); }
+.tech-category:nth-child(3n + 2)::before { top: 15%; left: 8%; width: 96%; height: 37%; transform: rotate(-.7deg); }
+.tech-category:nth-child(3n + 2)::after { top: 51%; right: 8%; width: 89%; height: 35%; transform: rotate(2.8deg); }
+.tech-category:nth-child(4n)::before { top: 31%; left: -7%; width: 81%; height: 44%; transform: rotate(-3.2deg); }
+.tech-category:nth-child(4n)::after { top: 68%; right: -8%; width: 92%; height: 25%; transform: rotate(.4deg); }
 .tech-category h2 { position: relative; width: fit-content; margin: 0 0 24px; font: 600 1.55rem/1 'Caveat Variable', cursive; letter-spacing: .01em; }
 .tech-category h2::before { position: absolute; z-index: -1; inset: 43% -8px 2px; content: ''; opacity: .44; background: var(--category-color); clip-path: polygon(0 28%, 14% 8%, 43% 21%, 71% 0, 100% 19%, 96% 83%, 59% 69%, 27% 100%, 3% 78%); transform: rotate(-1.7deg); }
 .tech-category:nth-child(even) h2::before { inset-inline: -5px -13px; clip-path: polygon(1% 5%, 30% 19%, 56% 0, 100% 26%, 96% 91%, 68% 72%, 33% 100%, 0 74%); transform: rotate(1.4deg); }
