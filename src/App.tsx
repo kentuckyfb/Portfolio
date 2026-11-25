@@ -352,12 +352,20 @@ function ContactPage() {
 }
 
 function ProjectsOverview() {
+  const [techPage, setTechPage] = useState(0)
+  const techRail = useRef<HTMLDivElement | null>(null)
+
+  const showTechPage = (page: number) => {
+    const rail = techRail.current
+    if (rail) rail.scrollTo({ left: page * rail.clientWidth, behavior: 'smooth' })
+  }
+
   return (
     <article className="projects-overview">
       <header className="empty-state projects-heading">
         <div><h1>Projects</h1><p>Selected work and experiments.</p></div>
       </header>
-      <div className="tech-categories" data-horizontal-scroll>
+      <div className="tech-categories" ref={techRail} data-horizontal-scroll onScroll={(event) => setTechPage(Math.round(event.currentTarget.scrollLeft / event.currentTarget.clientWidth))}>
         {techCategoryPages.map((categories, pageIndex) => (
           <div className="tech-category-page" key={pageIndex}>
             {categories.map(({ label, color, items }) => (
@@ -375,6 +383,9 @@ function ProjectsOverview() {
             ))}
           </div>
         ))}
+      </div>
+      <div className="tech-slider-indicator" aria-label="Technology groups">
+        {[0, 1].map((page) => <button className={techPage === page ? 'is-active' : ''} type="button" key={page} aria-label={`Show technology group ${page + 1}`} aria-current={techPage === page ? 'true' : undefined} onClick={() => showTechPage(page)} />)}
       </div>
     </article>
   )
