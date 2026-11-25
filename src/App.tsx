@@ -352,6 +352,34 @@ function ContactPage() {
 
 function ProjectsOverview() {
   const [grouped, setGrouped] = useState(true)
+  const [orbitRotation, setOrbitRotation] = useState(0)
+  const orbitDrag = useRef<{ pointerId: number; angle: number } | null>(null)
+
+  const pointerAngle = (event: ReactPointerEvent<HTMLDivElement>) => {
+    const bounds = event.currentTarget.getBoundingClientRect()
+    return Math.atan2(event.clientY - bounds.top - bounds.height / 2, event.clientX - bounds.left - bounds.width / 2) * 180 / Math.PI
+  }
+
+  const startOrbit = (event: ReactPointerEvent<HTMLDivElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId)
+    orbitDrag.current = { pointerId: event.pointerId, angle: pointerAngle(event) }
+  }
+
+  const rotateOrbit = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (orbitDrag.current?.pointerId !== event.pointerId) return
+    const angle = pointerAngle(event)
+    let delta = angle - orbitDrag.current.angle
+    if (delta > 180) delta -= 360
+    if (delta < -180) delta += 360
+    orbitDrag.current.angle = angle
+    setOrbitRotation((rotation) => rotation + delta)
+  }
+
+  const stopOrbit = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (orbitDrag.current?.pointerId !== event.pointerId) return
+    orbitDrag.current = null
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+  }
 
   return (
     <article className="projects-overview">
@@ -379,10 +407,16 @@ function ProjectsOverview() {
           ))}
         </div>
       ) : (
-        <div className="tech-mix">
-          {techLibrary.map(({ name }) => (
-            <div className="tech-mix-icon" key={name} title={name} aria-label={name} style={{ color: techColor(name) }}><TechMark name={name} /></div>
-          ))}
+        <div className="tech-orbit" onPointerDown={startOrbit} onPointerMove={rotateOrbit} onPointerUp={stopOrbit} onPointerCancel={stopOrbit}>
+          {techLibrary.map(({ name }, index) => {
+            const ring = index % 5
+            const position = Math.floor(index / 5)
+            const angle = position * (360 / Math.ceil(techLibrary.length / 5)) + ring * 13 + orbitRotation
+            const radius = [72, 132, 194, 260, 336][ring]
+            return (
+              <div className="tech-orbit-icon" key={name} title={name} role="img" aria-label={name} style={{ color: techColor(name), transform: `rotate(${angle}deg) translateX(${radius}px) rotate(${-angle}deg)` }}><TechMark name={name} /></div>
+            )
+          })}
         </div>
       )}
     </article>
