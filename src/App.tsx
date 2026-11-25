@@ -130,6 +130,11 @@ const TITLE_EXPAND_MS = 950
 const TRANSITION_MS = TITLE_COLLAPSE_MS + NAV_SHIFT_MS + TITLE_EXPAND_MS
 const detailTitleId = (id: string) => `detail-title-${id}`
 const detailTitleTransition = { layout: { duration: TITLE_COLLAPSE_MS / 1000, ease: [0.22, 1, 0.36, 1] as [number, number, number, number] } }
+const detailStageVariants = {
+  initial: (direction: 1 | -1) => ({ opacity: direction < 0 ? 1 : 0, y: direction < 0 ? '-100vh' : 0 }),
+  enter: { opacity: 1, y: 0 },
+  exit: (direction: 1 | -1) => ({ opacity: 1, y: direction > 0 ? '-100vh' : '100vh' }),
+}
 
 type TechEntry = { name: string; icon?: SimpleIcon; monogram?: string }
 type TechCategory = { label: string; color: string; items: TechEntry[] }
@@ -445,6 +450,9 @@ export default function App() {
   const [connector, setConnector] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null)
   const [detailCollapsed, setDetailCollapsed] = useState(false)
   const [detailOffset, setDetailOffset] = useState(0)
+  const [detailDirection, setDetailDirection] = useState<1 | -1>(1)
+  const [departingDetail, setDepartingDetail] = useState<string | null>(null)
+  const [linePhase, setLinePhase] = useState<'hidden' | 'expand' | 'steady' | 'retract'>('steady')
   const locked = useRef(false)
   const draggingBox = useRef(false)
   const transitionTimers = useRef<number[]>([])
@@ -470,6 +478,7 @@ export default function App() {
     setPreviewGroup(null)
     const fromDetail = ['project', 'career', 'education'].includes(pages[active].kind)
     const toDetail = ['project', 'career', 'education'].includes(pages[target].kind)
+    const direction: 1 | -1 = target > active ? 1 : -1
     const schedule = (callback: () => void, delay: number) => {
       transitionTimers.current.push(window.setTimeout(callback, delay))
     }
@@ -477,13 +486,38 @@ export default function App() {
     transitionTimers.current.forEach(window.clearTimeout)
     transitionTimers.current = []
 
+    setDetailDirection(direction)
+
+    if (fromDetail && toDetail && direction > 0) {
+      setDepartingDetail(pages[active].id)
+      setLinePhase('hidden')
+      setDetailOffset(0)
+      setDetailCollapsed(true)
+      setActive(target)
+      schedule(() => {
+        setDepartingDetail(null)
+        setLinePhase('expand')
+        revealDetailTitle(pages[target].id)
+      }, NAV_SHIFT_MS)
+      schedule(() => {
+        setLinePhase('steady')
+        locked.current = false
+      }, NAV_SHIFT_MS + TITLE_EXPAND_MS)
+      return
+    }
+
     if (fromDetail) {
+      setLinePhase('retract')
       setDetailCollapsed(true)
       schedule(() => {
+        setLinePhase('hidden')
         setDetailOffset(0)
         setActive(target)
         if (toDetail) {
-          schedule(() => revealDetailTitle(pages[target].id), NAV_SHIFT_MS)
+          schedule(() => {
+            setLinePhase('steady')
+            revealDetailTitle(pages[target].id)
+          }, NAV_SHIFT_MS)
           schedule(() => { locked.current = false }, NAV_SHIFT_MS + TITLE_EXPAND_MS)
         } else {
           setDetailCollapsed(false)
@@ -494,11 +528,18 @@ export default function App() {
     }
 
     if (toDetail) {
+      setLinePhase('hidden')
       setDetailOffset(0)
       setDetailCollapsed(true)
       setActive(target)
-      schedule(() => revealDetailTitle(pages[target].id), NAV_SHIFT_MS)
-      schedule(() => { locked.current = false }, NAV_SHIFT_MS + TITLE_EXPAND_MS)
+      schedule(() => {
+        setLinePhase('expand')
+        revealDetailTitle(pages[target].id)
+      }, NAV_SHIFT_MS)
+      schedule(() => {
+        setLinePhase('steady')
+        locked.current = false
+      }, NAV_SHIFT_MS + TITLE_EXPAND_MS)
       return
     }
 
@@ -710,9 +751,9 @@ export default function App() {
                                 {child.lines ? (
                                   <span className="nav-label-copy nav-label-timeline">
                                     <span>{child.lines[0]}</span>
-                                    {!childTitleExpanded && <motion.span layoutId={detailTitleId(child.id)} transition={detailTitleTransition}>{child.lines[1]}</motion.span>}
+                                    {!childTitleExpanded && child.id !== departingDetail && <motion.span layoutId={detailTitleId(child.id)} transition={detailTitleTransition}>{child.lines[1]}</motion.span>}
                                   </span>
-                                ) : !childTitleExpanded && (
+                                ) : !childTitleExpanded && child.id !== departingDetail && (
                                   <motion.span className="nav-label-copy" layoutId={detailTitleId(child.id)} transition={detailTitleTransition}>{child.label}</motion.span>
                                 )}
                                 {(!childActive || !detailPage) && renderActiveBox(child.id, 'child')}
@@ -730,29 +771,31 @@ export default function App() {
         </div>
       </nav>
 
-      {connector && (
+      {connector && linePhase !== 'hidden' && (
         <svg className="nav-title-connector" aria-hidden="true">
           <motion.line
-            key={`${current.id}-${detailCollapsed ? 'nav' : 'title'}`}
+            key={`${current.id}-${linePhase}`}
             x1={connector.x1}
             y1={connector.y1}
             x2={connector.x2}
             y2={connector.y1}
-            initial={{ pathLength: 0, opacity: .35 }}
-            animate={{ pathLength: 1, opacity: 1 }}
-            transition={{ duration: .85, ease: [0.22, 1, 0.36, 1] }}
+            initial={{ pathLength: linePhase === 'expand' ? 0 : 1, opacity: 1 }}
+            animate={{ pathLength: linePhase === 'retract' ? 0 : 1, opacity: 1 }}
+            transition={{ duration: linePhase === 'retract' ? TITLE_COLLAPSE_MS / 1000 : TITLE_EXPAND_MS / 1000, ease: [0.22, 1, 0.36, 1] }}
           />
         </svg>
       )}
 
-      <AnimatePresence mode="wait" initial={false}>
+      <AnimatePresence mode={detailPage ? 'sync' : 'wait'} initial={false} custom={detailDirection}>
         <motion.section
           key={current.id}
           className={`stage stage-${current.kind} ${current.id === 'projects' ? 'stage-projects' : ''}`}
-          initial={detailPage ? { opacity: 0, y: 0 } : { opacity: 0, y: 36 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={detailPage ? { opacity: 0, y: 0 } : { opacity: 0, y: -30 }}
-          transition={{ duration: .56, ease: [0.22, 1, 0.36, 1] }}
+          custom={detailDirection}
+          variants={detailPage ? detailStageVariants : undefined}
+          initial={detailPage ? 'initial' : { opacity: 0, y: 36 }}
+          animate={detailPage ? 'enter' : { opacity: 1, y: 0 }}
+          exit={detailPage ? 'exit' : { opacity: 0, y: -30 }}
+          transition={{ duration: detailPage ? .8 : .56, ease: [0.22, 1, 0.36, 1] }}
           aria-live="polite"
         >
           {current.kind === 'home' && (

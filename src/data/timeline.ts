@@ -85,7 +85,7 @@ export const career: CareerEntry[] = [
 export const education: EducationEntry[] = [
   {
     id: 'uclan-software-engineering',
-    qualification: 'Software Engineering, Computer Software Engineering',
+    qualification: 'Software Engineering',
     institution: 'University of Central Lancashire',
     period: '2021 - December 2024',
     learned: [],
