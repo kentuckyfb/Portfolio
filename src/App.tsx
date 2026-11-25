@@ -482,29 +482,36 @@ export default function App() {
     setHoveredNav(target?.dataset.navKey ?? null)
   }
 
-  const renderActiveBox = (key: string, level: 'home' | 'main' | 'child') => (
-    (hoveredNav ?? current.id) === key && (
-      <motion.span
-        className={`nav-active-box nav-active-box-${level}`}
-        layoutId="nav-active-box"
-        drag
-        dragMomentum={false}
-        dragSnapToOrigin
-        dragTransition={{ bounceStiffness: 720, bounceDamping: 28 }}
-        whileHover={{ scale: 1.025 }}
-        whileTap={{ scale: .96 }}
-        whileDrag={{ scale: 1.06, rotate: -.7 }}
-        onDragStart={() => { draggingBox.current = true }}
-        onDragEnd={moveActiveBox}
-        transition={{
-          layout: { type: 'spring', stiffness: 620, damping: 34, mass: .62 },
-          scale: { type: 'spring', stiffness: 720, damping: 30 },
-          rotate: { type: 'spring', stiffness: 650, damping: 28 },
-        }}
-        aria-hidden="true"
-      />
+  const renderActiveBox = (key: string, level: 'home' | 'main' | 'child') => {
+    const activeBox = current.id === key
+    const hoverBox = hoveredNav === key && !activeBox
+    return (
+      <>
+        {hoverBox && <motion.span className={`nav-hover-box nav-hover-box-${level}`} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} aria-hidden="true" />}
+        {activeBox && (
+          <motion.span
+            className={`nav-active-box nav-active-box-${level}`}
+            layoutId="nav-active-box"
+            drag
+            dragMomentum={false}
+            dragSnapToOrigin
+            dragTransition={{ bounceStiffness: 720, bounceDamping: 28 }}
+            whileHover={{ scale: 1.025 }}
+            whileTap={{ scale: .96 }}
+            whileDrag={{ scale: 1.06, rotate: -.7 }}
+            onDragStart={() => { draggingBox.current = true }}
+            onDragEnd={moveActiveBox}
+            transition={{
+              layout: { type: 'spring', stiffness: 620, damping: 34, mass: .62 },
+              scale: { type: 'spring', stiffness: 720, damping: 30 },
+              rotate: { type: 'spring', stiffness: 650, damping: 28 },
+            }}
+            aria-hidden="true"
+          />
+        )}
+      </>
     )
-  )
+  }
 
   useEffect(() => {
     const onWheel = (event: WheelEvent) => {
@@ -555,6 +562,7 @@ export default function App() {
             const selected = current.group === group.id
             const open = previewGroup ? previewGroup === group.id : selected
             const navKey = group.timeline ? `group-${group.id}` : group.id
+            const activeChildIndex = group.children?.findIndex((child) => child.id === current.id) ?? -1
             return (
               <div className={`branch ${selected ? 'selected' : ''}`} key={group.id}>
                 <button
@@ -576,7 +584,8 @@ export default function App() {
                 <AnimatePresence initial={false}>
                   {open && group.children && group.children.length > 0 && (
                     <motion.div
-                      className="subtree"
+                      className={`subtree ${activeChildIndex >= 0 ? 'has-active' : ''}`}
+                      style={{ '--active-path-height': `${activeChildIndex * 25 + 12.5}px` } as CSSProperties}
                       initial={{ height: 0, opacity: 0, x: -5 }}
                       animate={{ height: 'auto', opacity: 1, x: 0 }}
                       exit={{ height: 0, opacity: 0, x: -5 }}

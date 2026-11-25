@@ -99,35 +99,38 @@ button { color: inherit; font: inherit; }
 
 .nav-label-text { position: relative; display: inline-block; }
 
-.nav-active-box {
+.nav-active-box, .nav-hover-box {
   position: absolute;
   z-index: 3;
   inset: -3px -6px;
   border: 1px solid var(--ink);
+}
+.nav-active-box {
   cursor: grab;
   touch-action: none;
   will-change: transform;
   transition: border-color .16s ease;
 }
+.nav-hover-box { z-index: 2; border-color: rgba(24, 24, 23, .32); pointer-events: none; }
 .nav-active-box:hover { border-color: var(--ink); }
 .nav-active-box:active { border-color: var(--ink); cursor: grabbing; }
-.avatar-button .nav-active-box { inset: 0; border-radius: 50%; }
+.avatar-button .nav-active-box, .avatar-button .nav-hover-box { inset: 0; border-radius: 50%; }
 
-.tree-branches { position: relative; margin: -1px 0 0 27px; padding-top: 12px; overflow: hidden; border-left: 1px solid var(--line); }
+.tree-branches { position: relative; isolation: isolate; margin: -1px 0 0 27px; padding-top: 12px; overflow: hidden; border-left: 1px solid var(--line); }
 .branch { position: relative; margin-left: 11px; width: calc(100% - 11px); }
 .branch::before { position: absolute; top: 16px; left: -12px; width: 11px; height: 1px; content: ''; background: var(--line); }
 .branch.selected::before { width: 13px; background: var(--accent); animation: nav-path-x .24s cubic-bezier(.22, 1, .36, 1) both; transform-origin: left; }
-.branch.selected::after { position: absolute; z-index: 2; left: -12px; bottom: calc(100% - 16px); width: 1px; height: 100vh; content: ''; background: var(--accent); pointer-events: none; animation: nav-path-ink .22s ease-out both; }
+.branch.selected::after { position: absolute; z-index: 4; left: -12px; bottom: calc(100% - 16px); width: 1px; height: 100vh; content: ''; background: var(--accent); pointer-events: none; animation: nav-path-ink .22s ease-out both; }
 .branch-label { color: #6f6e68; font-size: .82rem; transition: color .2s ease, background .2s ease, transform .25s ease; }
 .branch-label:hover { color: var(--ink); }
 .branch.selected .branch-label { color: var(--ink); font-weight: 650; }
 
-.subtree { margin: 0 0 4px 23px; overflow: hidden; border-left: 1px solid var(--line); }
-.subtree button { position: relative; display: block; width: 100%; padding: 5px 9px 5px 15px; color: var(--muted); font-size: .75rem; text-align: left; background: none; border: 0; cursor: pointer; transition: color .2s ease, transform .2s ease; }
+.subtree { position: relative; margin: 0 0 4px 23px; overflow: hidden; border-left: 1px solid var(--line); }
+.subtree.has-active::after { position: absolute; z-index: 4; top: 0; left: -1px; width: 1px; height: var(--active-path-height); content: ''; background: var(--accent); pointer-events: none; animation: nav-path-ink .22s ease-out both; }
+.subtree button { position: relative; display: block; width: 100%; height: 25px; padding: 5px 9px 5px 15px; color: var(--muted); font-size: .75rem; line-height: 15px; text-align: left; background: none; border: 0; cursor: pointer; transition: color .2s ease, transform .2s ease; }
 .subtree button::before { position: absolute; top: 50%; left: 0; width: 9px; height: 1px; content: ''; background: var(--line); }
 .subtree button:hover, .subtree button.active { color: var(--ink); }
 .subtree button.active::before { background: var(--accent); animation: nav-path-x .24s cubic-bezier(.22, 1, .36, 1) both; transform-origin: left; }
-.subtree button.active::after { position: absolute; left: -1px; bottom: 50%; width: 1px; height: 100vh; content: ''; background: var(--accent); pointer-events: none; animation: nav-path-ink .22s ease-out both; }
 
 @keyframes nav-path-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
 @keyframes nav-path-ink { from { opacity: .2; } to { opacity: 1; } }
