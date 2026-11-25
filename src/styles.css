@@ -127,11 +127,13 @@ button { color: inherit; font: inherit; }
 .branch.selected .branch-label { color: var(--ink); font-weight: 650; }
 
 .subtree { position: relative; margin: 0 0 4px 23px; overflow: hidden; }
+.subtree-track { position: relative; }
 .subtree::before { position: absolute; z-index: 0; top: 0; left: 0; width: 1px; height: calc(100% - var(--child-row-half)); content: ''; background: var(--line); }
 .subtree.has-active::after { position: absolute; z-index: 4; top: 0; left: 0; width: 1px; height: var(--active-path-height); content: ''; background: var(--accent); pointer-events: none; animation: nav-path-ink .22s ease-out both; }
 .subtree button { position: relative; display: block; width: 100%; height: var(--child-row-height); padding: 5px 9px 5px 15px; color: var(--muted); font-size: .75rem; line-height: 15px; text-align: left; background: none; border: 0; cursor: pointer; transition: color .2s ease, transform .2s ease; }
 .subtree .nav-label-text { display: inline-block; max-width: 100%; overflow: visible; vertical-align: top; }
 .subtree .nav-label-copy { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.nav-label-space { display: block; visibility: hidden; max-width: 100%; overflow: hidden; white-space: nowrap; }
 .timeline-subtree button { padding-block: 4px; }
 .timeline-subtree .nav-label-text { display: block; }
 .timeline-subtree .nav-label-timeline { overflow: visible; text-overflow: clip; white-space: normal; }
@@ -146,6 +148,9 @@ button { color: inherit; font: inherit; }
 @keyframes nav-path-ink { from { opacity: .2; } to { opacity: 1; } }
 
 .stage { align-self: center; justify-self: center; width: min(900px, calc(100% - 48px)); padding-left: clamp(0px, 12vw, 180px); }
+.detail-page-title { display: inline-block; transform-origin: left center; }
+.nav-title-connector { position: fixed; z-index: 9; inset: 0; width: 100vw; height: 100dvh; overflow: visible; pointer-events: none; }
+.nav-title-connector polyline { fill: none; stroke: var(--accent); stroke-width: 1; vector-effect: non-scaling-stroke; }
 .welcome { position: relative; display: inline-block; }
 .handwritten { margin: 0; font-family: 'Caveat Variable', cursive; font-weight: 520; }
 .write-in { font-size: clamp(4rem, 10vw, 9rem); line-height: .9; letter-spacing: -.055em; white-space: nowrap; }

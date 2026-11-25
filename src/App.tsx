@@ -125,6 +125,7 @@ const pages: Page[] = [
 ]
 
 const TRANSITION_MS = 680
+const detailTitleId = (id: string) => `detail-title-${id}`
 
 type TechEntry = { name: string; icon?: SimpleIcon; monogram?: string }
 type TechCategory = { label: string; color: string; items: TechEntry[] }
@@ -220,7 +221,11 @@ function ProjectPage({ project }: { project: Project }) {
   return (
     <article className="project-page">
       <header className="project-header">
-        <h1><a href={project.url} target="_blank" rel="noreferrer">{project.name}</a></h1>
+        <h1 data-page-title>
+          <motion.span className="detail-page-title" layoutId={detailTitleId(`project-${project.id}`)}>
+            <a href={project.url} target="_blank" rel="noreferrer">{project.name}</a>
+          </motion.span>
+        </h1>
         <p className="project-description">{project.description}</p>
         <div className="project-links">
           <a className="project-link" href={project.repository} target="_blank" rel="noreferrer" aria-label={`Open ${project.name} on GitHub`}>
@@ -260,7 +265,7 @@ function CareerPage({ entry }: { entry: CareerEntry }) {
   return (
     <article className="timeline-page">
       <p className="timeline-period">{entry.period}</p>
-      <h1>{entry.role}</h1>
+      <h1 data-page-title><motion.span className="detail-page-title" layoutId={detailTitleId(`career-${entry.id}`)}>{entry.role}</motion.span></h1>
       <p className="timeline-place">{entry.company}</p>
       {entry.description && <p className="timeline-description">{entry.description}</p>}
       {(entry.tech.length > 0 || entry.skills.length > 0) && (
@@ -277,7 +282,7 @@ function EducationPage({ entry }: { entry: EducationEntry }) {
   return (
     <article className="timeline-page">
       <p className="timeline-period">{entry.period}</p>
-      <h1>{entry.qualification}</h1>
+      <h1 data-page-title><motion.span className="detail-page-title" layoutId={detailTitleId(`education-${entry.id}`)}>{entry.qualification}</motion.span></h1>
       <p className="timeline-place">{entry.institution}</p>
       {entry.learned.length > 0 && (
         <div className="timeline-details timeline-learning">
@@ -433,14 +438,18 @@ export default function App() {
   const [active, setActive] = useState(0)
   const [previewGroup, setPreviewGroup] = useState<string | null>(null)
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
+  const [connector, setConnector] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null)
   const locked = useRef(false)
   const draggingBox = useRef(false)
+  const direction = useRef(1)
   const current = pages[active]
+  const detailPage = ['project', 'career', 'education'].includes(current.kind)
 
   const navigate = useCallback((next: number) => {
     const target = Math.max(0, Math.min(pages.length - 1, next))
     if (target === active || locked.current) return
     locked.current = true
+    direction.current = target > active ? 1 : -1
     setPreviewGroup(null)
     setActive(target)
     window.setTimeout(() => { locked.current = false }, TRANSITION_MS)
@@ -539,6 +548,39 @@ export default function App() {
     }
   }, [active, navigate])
 
+  useEffect(() => {
+    if (!detailPage) {
+      setConnector(null)
+      return
+    }
+
+    let frame = 0
+    const started = performance.now()
+    const measure = () => {
+      const navItem = [...document.querySelectorAll<HTMLElement>('[data-nav-page]')]
+        .find((item) => item.dataset.navPage === current.id && item.offsetParent !== null)
+      const title = document.querySelector<HTMLElement>('[data-page-title]')
+      if (navItem && title) {
+        const navRect = (navItem.querySelector<HTMLElement>('.nav-active-box') ?? navItem).getBoundingClientRect()
+        const titleRect = title.getBoundingClientRect()
+        setConnector({
+          x1: navRect.right,
+          y1: navRect.top + navRect.height / 2,
+          x2: titleRect.left - 12,
+          y2: titleRect.top + titleRect.height / 2,
+        })
+      }
+      if (performance.now() - started < TRANSITION_MS + 120) frame = requestAnimationFrame(measure)
+    }
+
+    measure()
+    window.addEventListener('resize', measure)
+    return () => {
+      cancelAnimationFrame(frame)
+      window.removeEventListener('resize', measure)
+    }
+  }, [current.id, detailPage])
+
   return (
     <main className="canvas">
       <div className="paper-noise" aria-hidden="true" />
@@ -584,30 +626,45 @@ export default function App() {
                   {open && group.children && group.children.length > 0 && (
                     <motion.div
                       className={`subtree ${group.timeline ? 'timeline-subtree' : ''} ${activeChildIndex >= 0 ? 'has-active' : ''}`}
-                      style={{ '--child-row-height': `${childRowHeight}px`, '--child-row-half': `${childRowHeight / 2}px`, '--active-path-height': `${activeChildIndex * childRowHeight + childRowHeight / 2}px` } as CSSProperties}
+                      style={{ '--child-row-height': `${childRowHeight}px`, '--child-row-half': `${childRowHeight / 2}px`, '--active-path-height': `${activeChildIndex >= 0 ? childRowHeight / 2 : 0}px` } as CSSProperties}
                       initial={{ height: 0, opacity: 0, x: -5 }}
-                      animate={{ height: 'auto', opacity: 1, x: 0 }}
+                      animate={{ height: (group.children.length - Math.max(activeChildIndex, 0)) * childRowHeight, opacity: 1, x: 0 }}
                       exit={{ height: 0, opacity: 0, x: -5 }}
                       transition={{ duration: .28, ease: [0.22, 1, 0.36, 1] }}
                     >
-                      {group.children.map((child) => (
-                        <button
-                          key={child.id}
-                          className={current.id === child.id ? 'active' : ''}
-                          data-nav-key={child.id}
-                          data-nav-page={child.id}
-                          title={child.lines?.join(' — ') ?? child.label}
-                          onClick={() => navigateTo(child.id)}
-                          aria-current={current.id === child.id ? 'page' : undefined}
-                        >
-                          <span className="nav-label-text">
-                            {child.lines ? (
-                              <span className="nav-label-copy nav-label-timeline"><span>{child.lines[0]}</span><span>{child.lines[1]}</span></span>
-                            ) : <span className="nav-label-copy">{child.label}</span>}
-                            {renderActiveBox(child.id, 'child')}
-                          </span>
-                        </button>
-                      ))}
+                      <motion.div
+                        className="subtree-track"
+                        animate={{ y: activeChildIndex >= 0 ? -activeChildIndex * childRowHeight : 0 }}
+                        transition={{ duration: .68, ease: [0.22, 1, 0.36, 1] }}
+                      >
+                        {group.children.map((child) => {
+                          const childActive = current.id === child.id
+                          return (
+                            <button
+                              key={child.id}
+                              className={childActive ? 'active' : ''}
+                              data-nav-key={child.id}
+                              data-nav-page={child.id}
+                              title={child.lines?.join(' — ') ?? child.label}
+                              onClick={() => navigateTo(child.id)}
+                              aria-current={childActive ? 'page' : undefined}
+                            >
+                              <span className="nav-label-text">
+                                {child.lines ? (
+                                  <span className="nav-label-copy nav-label-timeline">
+                                    <span>{child.lines[0]}</span>
+                                    {!childActive && <motion.span layoutId={detailTitleId(child.id)}>{child.lines[1]}</motion.span>}
+                                  </span>
+                                ) : !childActive && (
+                                  <motion.span className="nav-label-copy" layoutId={detailTitleId(child.id)}>{child.label}</motion.span>
+                                )}
+                                {childActive && <span className="nav-label-space" aria-hidden="true">{child.label}</span>}
+                                {renderActiveBox(child.id, 'child')}
+                              </span>
+                            </button>
+                          )
+                        })}
+                      </motion.div>
                     </motion.div>
                   )}
                 </AnimatePresence>
@@ -617,14 +674,20 @@ export default function App() {
         </div>
       </nav>
 
-      <AnimatePresence mode="wait" initial={false}>
+      {connector && (
+        <svg className="nav-title-connector" aria-hidden="true">
+          <polyline points={`${connector.x1},${connector.y1} ${connector.x2 - 22},${connector.y1} ${connector.x2 - 22},${connector.y2} ${connector.x2},${connector.y2}`} />
+        </svg>
+      )}
+
+      <AnimatePresence mode="sync" initial={false}>
         <motion.section
           key={current.id}
           className={`stage stage-${current.kind} ${current.id === 'projects' ? 'stage-projects' : ''}`}
-          initial={{ opacity: 0, y: 36 }}
+          initial={detailPage ? { opacity: 1, y: direction.current > 0 ? '100vh' : '-100vh' } : { opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -30 }}
-          transition={{ duration: .56, ease: [0.22, 1, 0.36, 1] }}
+          exit={detailPage ? { opacity: 1, y: direction.current > 0 ? '-100vh' : '100vh' } : { opacity: 0, y: -30 }}
+          transition={{ duration: detailPage ? .68 : .56, ease: [0.22, 1, 0.36, 1] }}
           aria-live="polite"
         >
           {current.kind === 'home' && (
