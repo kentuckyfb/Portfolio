@@ -103,13 +103,13 @@ button { color: inherit; font: inherit; }
   position: absolute;
   z-index: 3;
   inset: -3px -6px;
-  border: 1px solid rgba(24, 24, 23, .72);
+  border: 1px solid var(--ink);
   cursor: grab;
   touch-action: none;
   will-change: transform;
-  transition: border-color .16s ease, box-shadow .16s ease;
+  transition: border-color .16s ease;
 }
-.nav-active-box:hover { border-color: var(--ink); box-shadow: 0 2px 0 rgba(24, 24, 23, .12); }
+.nav-active-box:hover { border-color: var(--ink); }
 .nav-active-box:active { border-color: var(--ink); cursor: grabbing; }
 .avatar-button .nav-active-box { inset: 0; }
 
@@ -213,10 +213,14 @@ button { color: inherit; font: inherit; }
 .projects-overview .empty-state h1 { font-size: clamp(3.5rem, 7vw, 6.5rem); }
 .projects-overview .empty-state > p:last-child { margin-top: 10px; }
 .tech-categories { position: relative; isolation: isolate; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(16px, 2.4vh, 28px) 14px; padding: 22px 8px 24px; }
-.tech-categories::before { position: absolute; z-index: -1; inset: -28px -34px; content: ''; background-image: linear-gradient(rgba(24, 24, 23, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(24, 24, 23, .055) 1px, transparent 1px); background-size: 22px 22px; mask-image: radial-gradient(ellipse at center, #000 42%, rgba(0, 0, 0, .82) 64%, transparent 88%); pointer-events: none; }
+.tech-categories::before { position: absolute; z-index: -1; inset: -170px -80px -110px; content: ''; background-image: linear-gradient(rgba(24, 24, 23, .055) 1px, transparent 1px), linear-gradient(90deg, rgba(24, 24, 23, .055) 1px, transparent 1px); background-size: 22px 22px; -webkit-mask-image: radial-gradient(ellipse 72% 68% at 50% 54%, #000 24%, rgba(0, 0, 0, .78) 58%, transparent 100%); mask-image: radial-gradient(ellipse 72% 68% at 50% 54%, #000 24%, rgba(0, 0, 0, .78) 58%, transparent 100%); pointer-events: none; }
 .tech-category { position: relative; isolation: isolate; z-index: 0; min-width: 0; padding: 6px 5px 10px; }
 .tech-scribble { position: absolute; z-index: 0; inset: 26px -7px -3px; width: calc(100% + 14px); height: calc(100% - 23px); overflow: visible; pointer-events: none; }
-.tech-scribble path { fill: none; stroke: var(--category-color); stroke-width: 13px; stroke-linecap: round; stroke-linejoin: round; opacity: .2; }
+.tech-scribble path { fill: none; stroke: var(--category-color); stroke-width: 13px; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; opacity: .2; animation: highlighter-draw 1.25s cubic-bezier(.45, 0, .18, 1) forwards; }
+.tech-category:nth-child(2n) .tech-scribble path { animation-delay: .08s; }
+.tech-category:nth-child(3n) .tech-scribble path { animation-delay: .16s; }
+.tech-category:nth-child(4n) .tech-scribble path { animation-delay: .24s; }
+@keyframes highlighter-draw { to { stroke-dashoffset: 0; } }
 .tech-category h2 { position: relative; z-index: 2; width: fit-content; margin: 0 0 15px; font: 650 clamp(1.2rem, 1.55vw, 1.5rem)/.92 'Caveat Variable', cursive; letter-spacing: -.015em; transform: rotate(-3deg) translateY(-2px); transform-origin: left center; }
 .tech-category h2::before { position: absolute; z-index: -1; inset: 43% -8px 2px; content: ''; opacity: .44; background: var(--category-color); clip-path: polygon(0 28%, 14% 8%, 43% 21%, 71% 0, 100% 19%, 96% 83%, 59% 69%, 27% 100%, 3% 78%); transform: rotate(-1.7deg); }
 .tech-category:nth-child(even) h2::before { inset-inline: -5px -13px; clip-path: polygon(1% 5%, 30% 19%, 56% 0, 100% 26%, 96% 91%, 68% 72%, 33% 100%, 0 74%); transform: rotate(1.4deg); }

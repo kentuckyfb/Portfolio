@@ -326,7 +326,7 @@ function ProjectsOverview() {
       <div className="tech-categories">
         {techCategories.map(({ label, color, items }, index) => (
           <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
-            <svg className="tech-scribble" viewBox="0 0 240 170" preserveAspectRatio="none" aria-hidden="true"><path d={techScribbles[index]} /></svg>
+            <svg className="tech-scribble" viewBox="0 0 240 170" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d={techScribbles[index]} /></svg>
             <h2>{label}</h2>
             <div className="tech-grid">
               {items.map(({ name }) => (
@@ -405,14 +405,13 @@ export default function App() {
         dragTransition={{ bounceStiffness: 720, bounceDamping: 28 }}
         whileHover={{ scale: 1.025 }}
         whileTap={{ scale: .96 }}
-        whileDrag={{ scale: 1.06, rotate: -.7, boxShadow: '0 8px 20px rgba(24, 24, 23, .14)' }}
+        whileDrag={{ scale: 1.06, rotate: -.7 }}
         onDragStart={() => { draggingBox.current = true }}
         onDragEnd={moveActiveBox}
         transition={{
           layout: { type: 'spring', stiffness: 620, damping: 34, mass: .62 },
           scale: { type: 'spring', stiffness: 720, damping: 30 },
           rotate: { type: 'spring', stiffness: 650, damping: 28 },
-          boxShadow: { duration: .16 },
         }}
         aria-hidden="true"
       />
