@@ -199,10 +199,10 @@ const techCategories: TechCategory[] = [
 
 const techLibrary = techCategories.flatMap(({ items }) => items)
 const techByName = new Map(techLibrary.map((tech) => [tech.name, tech]))
-const TECH_TILE_WIDTH = 980
-const TECH_TILE_HEIGHT = 720
+const TECH_TILE_WIDTH = 960
+const TECH_TILE_HEIGHT = 576
 const techTileCopies = [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]] as const
-const techPlaneItems = Array.from({ length: 126 }, (_, index) => techLibrary[index % techLibrary.length])
+const techPlaneItems = Array.from({ length: 128 }, (_, index) => techLibrary[index % techLibrary.length])
 const techColor = (name: string) => {
   const tech = techByName.get(name)
   return !tech?.icon || name === 'Unity' ? '#181817' : `#${tech.icon.hex}`
@@ -358,7 +358,12 @@ function ProjectsOverview() {
   const [grouped, setGrouped] = useState(true)
   const planeOffset = useRef({ x: 0, y: 0 })
   const planeTiles = useRef<(HTMLDivElement | null)[]>([])
-  const planeDrag = useRef<{ pointerId: number; x: number; y: number } | null>(null)
+  const planeDrag = useRef<{ pointerId: number; x: number; y: number; time: number; velocityX: number; velocityY: number } | null>(null)
+  const inertiaFrame = useRef<number | null>(null)
+
+  useEffect(() => () => {
+    if (inertiaFrame.current !== null) cancelAnimationFrame(inertiaFrame.current)
+  }, [])
 
   const positionPlane = (x: number, y: number) => {
     planeOffset.current = { x, y }
@@ -371,23 +376,43 @@ function ProjectsOverview() {
   }
 
   const startPlane = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (inertiaFrame.current !== null) cancelAnimationFrame(inertiaFrame.current)
+    inertiaFrame.current = null
     event.currentTarget.setPointerCapture(event.pointerId)
-    planeDrag.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY }
+    planeDrag.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, time: performance.now(), velocityX: 0, velocityY: 0 }
   }
 
   const movePlane = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (planeDrag.current?.pointerId !== event.pointerId) return
     const deltaX = event.clientX - planeDrag.current.x
     const deltaY = event.clientY - planeDrag.current.y
+    const now = performance.now()
+    const elapsed = Math.max(now - planeDrag.current.time, 8)
+    planeDrag.current.velocityX = planeDrag.current.velocityX * .62 + deltaX / elapsed * .38
+    planeDrag.current.velocityY = planeDrag.current.velocityY * .62 + deltaY / elapsed * .38
     planeDrag.current.x = event.clientX
     planeDrag.current.y = event.clientY
+    planeDrag.current.time = now
     positionPlane(planeOffset.current.x + deltaX, planeOffset.current.y + deltaY)
   }
 
   const stopPlane = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (planeDrag.current?.pointerId !== event.pointerId) return
+    let { velocityX, velocityY } = planeDrag.current
     planeDrag.current = null
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
+    let previous = performance.now()
+    const glide = (now: number) => {
+      const elapsed = Math.min(now - previous, 32)
+      previous = now
+      const friction = Math.pow(.94, elapsed / 16.67)
+      velocityX *= friction
+      velocityY *= friction
+      positionPlane(planeOffset.current.x + velocityX * elapsed, planeOffset.current.y + velocityY * elapsed)
+      if (Math.hypot(velocityX, velocityY) > .015) inertiaFrame.current = requestAnimationFrame(glide)
+      else inertiaFrame.current = null
+    }
+    if (Math.hypot(velocityX, velocityY) > .015) inertiaFrame.current = requestAnimationFrame(glide)
   }
 
   return (
@@ -420,7 +445,7 @@ function ProjectsOverview() {
           {techTileCopies.map(([tileX, tileY], tileIndex) => (
             <div className="tech-plane-tile" key={`${tileX}-${tileY}`} ref={(node) => { planeTiles.current[tileIndex] = node }} aria-hidden={tileX !== 1 || tileY !== 1} style={{ transform: `translate3d(${(tileX - 1) * TECH_TILE_WIDTH}px, ${(tileY - 1) * TECH_TILE_HEIGHT}px, 0)` }}>
               {techPlaneItems.map(({ name }, index) => (
-                <div className="tech-plane-icon" key={`${name}-${index}`} title={name} role="img" aria-label={name} style={{ color: techColor(name) }}><TechMark name={name} /></div>
+                <div className="tech-plane-icon" key={`${name}-${index}`} title={name} role="img" aria-label={name} style={{ color: techColor(name) }}><TechMark name={name} /><span>{name}</span></div>
               ))}
             </div>
           ))}
