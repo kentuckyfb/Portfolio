@@ -352,6 +352,7 @@ function ContactPage() {
 
 function ProjectsOverview() {
   const [activeCategory, setActiveCategory] = useState(0)
+  const categoryPanels = useRef<HTMLDivElement | null>(null)
   const categoryWheelLock = useRef(false)
   const categoryWheelTimer = useRef<number | null>(null)
 
@@ -367,8 +368,21 @@ function ProjectsOverview() {
     event.stopPropagation()
     if (categoryWheelLock.current) return
     categoryWheelLock.current = true
-    setActiveCategory(next)
+    showCategory(next)
     categoryWheelTimer.current = window.setTimeout(() => { categoryWheelLock.current = false }, 420)
+  }
+
+  const showCategory = (index: number) => {
+    const rail = categoryPanels.current
+    const panel = rail?.children[index] as HTMLElement | undefined
+    if (rail && panel) rail.scrollTo({ top: panel.offsetTop, behavior: 'smooth' })
+  }
+
+  const syncCategory = (event: React.UIEvent<HTMLDivElement>) => {
+    const rail = event.currentTarget
+    const panels = [...rail.children] as HTMLElement[]
+    const nearest = panels.reduce((closest, panel, index) => Math.abs(panel.offsetTop - rail.scrollTop) < Math.abs(panels[closest].offsetTop - rail.scrollTop) ? index : closest, 0)
+    setActiveCategory(nearest)
   }
 
   return (
@@ -393,18 +407,20 @@ function ProjectsOverview() {
       </div>
       <div className="tech-compact" onWheel={moveCategory}>
         <div className="tech-compact-nav" role="tablist" aria-label="Technology categories">
-          {techCategories.map(({ label, color }, index) => <button className={activeCategory === index ? 'is-active' : ''} type="button" role="tab" aria-selected={activeCategory === index} style={{ '--category-color': color } as CSSProperties} key={label} onClick={() => setActiveCategory(index)}>{label}</button>)}
+          {techCategories.map(({ label, color }, index) => <button className={activeCategory === index ? 'is-active' : ''} type="button" role="tab" aria-selected={activeCategory === index} style={{ '--category-color': color } as CSSProperties} key={label} onClick={() => showCategory(index)}>{label}</button>)}
         </div>
-        <AnimatePresence mode="wait">
-          <motion.div className="tech-compact-panel" key={techCategories[activeCategory].label} role="tabpanel" initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -10 }} transition={{ duration: .24, ease: [0.22, 1, 0.36, 1] }}>
-            {techCategories[activeCategory].items.map(({ name }) => (
-              <div className="tech-app" key={name} title={name} aria-label={name}>
-                <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
-                <span>{name}</span>
-              </div>
-            ))}
-          </motion.div>
-        </AnimatePresence>
+        <div className="tech-compact-panels" ref={categoryPanels} onScroll={syncCategory}>
+          {techCategories.map(({ label, items }) => (
+            <section className="tech-compact-panel" key={label} role="tabpanel" aria-label={label}>
+              {items.map(({ name }) => (
+                <div className="tech-app" key={name} title={name} aria-label={name}>
+                  <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
+                  <span>{name}</span>
+                </div>
+              ))}
+            </section>
+          ))}
+        </div>
       </div>
     </article>
   )
