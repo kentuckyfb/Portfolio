@@ -91,7 +91,7 @@ type NavGroup = {
 
 const groups: NavGroup[] = [
   { id: 'about', label: 'About me', note: 'A little more personal.', children: [{ id: 'about-personal', label: 'A bit more personal' }] },
-  { id: 'projects', label: 'Projects', note: 'Selected work and experiments.', children: projects.map(({ id, name }) => ({ id: `project-${id}`, label: name })) },
+  { id: 'projects', label: 'Projects', note: "Tech stacks I've used.", children: projects.map(({ id, name }) => ({ id: `project-${id}`, label: name })) },
   { id: 'career', label: 'Career', note: 'Where I have worked.', timeline: true, children: career.map(({ id, role, period }) => ({ id: `career-${id}`, label: `${period} · ${role}` })) },
   { id: 'education', label: 'Education', note: 'How I got here.', timeline: true, children: education.map(({ id, qualification, period }) => ({ id: `education-${id}`, label: `${period} · ${qualification}` })) },
   { id: 'contact', label: 'Get in touch', note: 'Let’s make something.' },
@@ -374,7 +374,7 @@ function ProjectsOverview() {
   return (
     <article className="projects-overview">
       <header className="empty-state projects-heading">
-        <div><h1>Projects</h1><p>Selected work and experiments.</p></div>
+        <div><h1>Projects</h1><p>Tech stacks I've used.</p></div>
       </header>
       <div className="tech-categories">
         {techCategories.map(({ label, color, items }) => (
