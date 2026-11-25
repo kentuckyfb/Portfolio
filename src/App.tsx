@@ -387,9 +387,18 @@ export default function App() {
         drag
         dragMomentum={false}
         dragSnapToOrigin
+        dragTransition={{ bounceStiffness: 720, bounceDamping: 28 }}
+        whileHover={{ scale: 1.025 }}
+        whileTap={{ scale: .96 }}
+        whileDrag={{ scale: 1.06, rotate: -.7, boxShadow: '0 8px 20px rgba(24, 24, 23, .14)' }}
         onDragStart={() => { draggingBox.current = true }}
         onDragEnd={moveActiveBox}
-        transition={{ type: 'spring', stiffness: 480, damping: 38, mass: .72 }}
+        transition={{
+          layout: { type: 'spring', stiffness: 620, damping: 34, mass: .62 },
+          scale: { type: 'spring', stiffness: 720, damping: 30 },
+          rotate: { type: 'spring', stiffness: 650, damping: 28 },
+          boxShadow: { duration: .16 },
+        }}
         aria-hidden="true"
       />
     )
