@@ -345,6 +345,43 @@ export default function App() {
 
   const navigateTo = (id: string) => navigate(pages.findIndex((page) => page.id === id))
 
+  const moveActiveBox = (_event: MouseEvent | TouchEvent | PointerEvent, info: { point: { x: number; y: number } }) => {
+    const nav = document.querySelector<HTMLElement>('.explorer')
+    if (!nav) return
+
+    const navRect = nav.getBoundingClientRect()
+    const margin = 28
+    if (
+      info.point.x < navRect.left - margin || info.point.x > navRect.right + margin ||
+      info.point.y < navRect.top - margin || info.point.y > navRect.bottom + margin
+    ) return
+
+    const target = [...nav.querySelectorAll<HTMLElement>('[data-nav-page]')]
+      .filter((item) => item.offsetParent !== null)
+      .map((item) => {
+        const rect = item.getBoundingClientRect()
+        const dx = Math.max(rect.left - info.point.x, 0, info.point.x - rect.right)
+        const dy = Math.max(rect.top - info.point.y, 0, info.point.y - rect.bottom)
+        return { id: item.dataset.navPage, distance: Math.hypot(dx, dy) }
+      })
+      .sort((a, b) => a.distance - b.distance)[0]
+
+    if (target?.id && target.distance <= margin) navigateTo(target.id)
+  }
+
+  const activeBox = (
+    <motion.span
+      className="nav-active-box"
+      layoutId="nav-active-box"
+      drag
+      dragMomentum={false}
+      dragSnapToOrigin
+      onDragEnd={moveActiveBox}
+      transition={{ type: 'spring', stiffness: 520, damping: 42 }}
+      aria-hidden="true"
+    />
+  )
+
   useEffect(() => {
     const onWheel = (event: WheelEvent) => {
       const direction = Math.sign(event.deltaY)
@@ -378,8 +415,9 @@ export default function App() {
       <div className="paper-noise" aria-hidden="true" />
 
       <nav className="explorer" aria-label="Portfolio navigation" data-scroll-region>
-        <button className="avatar-button" onClick={() => navigate(0)} aria-label="Home">
+        <button className="avatar-button" data-nav-page="home" onClick={() => navigate(0)} aria-label="Home">
           <img src={avatar} alt="" />
+          {current.id === 'home' && activeBox}
         </button>
 
         <div className="tree-branches">
@@ -390,6 +428,7 @@ export default function App() {
               <div className={`branch ${selected ? 'selected' : ''}`} key={group.id}>
                 <button
                   className="branch-label"
+                  data-nav-page={group.timeline ? group.children?.[0]?.id : group.id}
                   onClick={() => group.timeline
                     ? setPreviewGroup((id) => id === group.id ? null : group.id)
                     : navigateTo(group.id)}
@@ -397,6 +436,7 @@ export default function App() {
                   aria-expanded={group.timeline ? open : undefined}
                 >
                   {group.label}
+                  {current.id === group.id && activeBox}
                 </button>
 
                 <AnimatePresence initial={false}>
@@ -412,10 +452,12 @@ export default function App() {
                         <button
                           key={child.id}
                           className={current.id === child.id ? 'active' : ''}
+                          data-nav-page={child.id}
                           onClick={() => navigateTo(child.id)}
                           aria-current={current.id === child.id ? 'page' : undefined}
                         >
                           {child.label}
+                          {current.id === child.id && activeBox}
                         </button>
                       ))}
                     </motion.div>
