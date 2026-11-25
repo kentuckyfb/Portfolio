@@ -221,9 +221,9 @@ function TechMark({ name }: { name: string }) {
     : <span className="tech-fallback">{tech?.monogram ?? name.slice(0, 2)}</span>
 }
 
-function ProjectPage({ project, showTitle }: { project: Project; showTitle: boolean }) {
+function ProjectPage({ project, showTitle, verticalOffset }: { project: Project; showTitle: boolean; verticalOffset: number }) {
   return (
-    <article className="project-page">
+    <article className="project-page" style={{ transform: `translateY(${verticalOffset}px)` }}>
       <header className="project-header">
         <h1 className="detail-title-slot" data-page-title={showTitle ? '' : undefined}>
           {showTitle && <motion.span className="detail-page-title" layoutId={detailTitleId(`project-${project.id}`)} transition={detailTitleTransition}>
@@ -265,9 +265,9 @@ function ProjectPage({ project, showTitle }: { project: Project; showTitle: bool
   )
 }
 
-function CareerPage({ entry, showTitle }: { entry: CareerEntry; showTitle: boolean }) {
+function CareerPage({ entry, showTitle, verticalOffset }: { entry: CareerEntry; showTitle: boolean; verticalOffset: number }) {
   return (
-    <article className="timeline-page">
+    <article className="timeline-page" style={{ transform: `translateY(${verticalOffset}px)` }}>
       <p className="timeline-period">{entry.period}</p>
       <h1 className="detail-title-slot" data-page-title={showTitle ? '' : undefined}>{showTitle && <motion.span className="detail-page-title" layoutId={detailTitleId(`career-${entry.id}`)} transition={detailTitleTransition}>{entry.role}</motion.span>}</h1>
       <p className="timeline-place">{entry.company}</p>
@@ -282,9 +282,9 @@ function CareerPage({ entry, showTitle }: { entry: CareerEntry; showTitle: boole
   )
 }
 
-function EducationPage({ entry, showTitle }: { entry: EducationEntry; showTitle: boolean }) {
+function EducationPage({ entry, showTitle, verticalOffset }: { entry: EducationEntry; showTitle: boolean; verticalOffset: number }) {
   return (
-    <article className="timeline-page">
+    <article className="timeline-page" style={{ transform: `translateY(${verticalOffset}px)` }}>
       <p className="timeline-period">{entry.period}</p>
       <h1 className="detail-title-slot" data-page-title={showTitle ? '' : undefined}>{showTitle && <motion.span className="detail-page-title" layoutId={detailTitleId(`education-${entry.id}`)} transition={detailTitleTransition}>{entry.qualification}</motion.span>}</h1>
       <p className="timeline-place">{entry.institution}</p>
@@ -444,11 +444,24 @@ export default function App() {
   const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const [connector, setConnector] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(null)
   const [detailCollapsed, setDetailCollapsed] = useState(false)
+  const [detailOffset, setDetailOffset] = useState(0)
   const locked = useRef(false)
   const draggingBox = useRef(false)
   const transitionTimers = useRef<number[]>([])
   const current = pages[active]
   const detailPage = ['project', 'career', 'education'].includes(current.kind)
+
+  const revealDetailTitle = (pageId: string) => {
+    const navItem = [...document.querySelectorAll<HTMLElement>('[data-nav-page]')]
+      .find((item) => item.dataset.navPage === pageId && item.offsetParent !== null)
+    const titleSlot = document.querySelector<HTMLElement>('.stage .detail-title-slot')
+    if (navItem && titleSlot) {
+      const navRect = navItem.getBoundingClientRect()
+      const slotRect = titleSlot.getBoundingClientRect()
+      setDetailOffset(navRect.top + navRect.height / 2 - (slotRect.top + slotRect.height / 2))
+    }
+    requestAnimationFrame(() => setDetailCollapsed(false))
+  }
 
   const navigate = useCallback((next: number) => {
     const target = Math.max(0, Math.min(pages.length - 1, next))
@@ -467,9 +480,10 @@ export default function App() {
     if (fromDetail) {
       setDetailCollapsed(true)
       schedule(() => {
+        setDetailOffset(0)
         setActive(target)
         if (toDetail) {
-          schedule(() => setDetailCollapsed(false), NAV_SHIFT_MS)
+          schedule(() => revealDetailTitle(pages[target].id), NAV_SHIFT_MS)
           schedule(() => { locked.current = false }, NAV_SHIFT_MS + TITLE_EXPAND_MS)
         } else {
           setDetailCollapsed(false)
@@ -480,9 +494,10 @@ export default function App() {
     }
 
     if (toDetail) {
+      setDetailOffset(0)
       setDetailCollapsed(true)
       setActive(target)
-      schedule(() => setDetailCollapsed(false), NAV_SHIFT_MS)
+      schedule(() => revealDetailTitle(pages[target].id), NAV_SHIFT_MS)
       schedule(() => { locked.current = false }, NAV_SHIFT_MS + TITLE_EXPAND_MS)
       return
     }
@@ -600,13 +615,15 @@ export default function App() {
       const title = document.querySelector<HTMLElement>('[data-page-title]')
       const stage = document.querySelector<HTMLElement>('.stage')
       if (navItem && (title || stage)) {
-        const navRect = (navItem.querySelector<HTMLElement>('.nav-label-text') ?? navItem).getBoundingClientRect()
+        const navRect = navItem.getBoundingClientRect()
+        const labelRect = (navItem.querySelector<HTMLElement>('.nav-label-text') ?? navItem).getBoundingClientRect()
+        const lineY = navRect.top + navRect.height / 2
         const titleRect = (title ?? stage)!.getBoundingClientRect()
         setConnector({
-          x1: navRect.right,
-          y1: navRect.top + navRect.height / 2,
+          x1: detailCollapsed ? labelRect.right : navRect.left,
+          y1: lineY,
           x2: titleRect.left - 12,
-          y2: navRect.top + navRect.height / 2,
+          y2: lineY,
         })
       }
       if (performance.now() - started < TRANSITION_MS + 120) frame = requestAnimationFrame(measure)
@@ -698,7 +715,6 @@ export default function App() {
                                 ) : !childTitleExpanded && (
                                   <motion.span className="nav-label-copy" layoutId={detailTitleId(child.id)} transition={detailTitleTransition}>{child.label}</motion.span>
                                 )}
-                                {childTitleExpanded && <span className="nav-label-space" aria-hidden="true">{child.label}</span>}
                                 {(!childActive || !detailPage) && renderActiveBox(child.id, 'child')}
                               </span>
                             </button>
@@ -716,7 +732,16 @@ export default function App() {
 
       {connector && (
         <svg className="nav-title-connector" aria-hidden="true">
-          <line x1={connector.x1} y1={connector.y1} x2={connector.x2} y2={connector.y1} />
+          <motion.line
+            key={`${current.id}-${detailCollapsed ? 'nav' : 'title'}`}
+            x1={connector.x1}
+            y1={connector.y1}
+            x2={connector.x2}
+            y2={connector.y1}
+            initial={{ pathLength: 0, opacity: .35 }}
+            animate={{ pathLength: 1, opacity: 1 }}
+            transition={{ duration: .85, ease: [0.22, 1, 0.36, 1] }}
+          />
         </svg>
       )}
 
@@ -748,9 +773,9 @@ export default function App() {
             </div>
           )}
 
-          {current.kind === 'project' && current.project && <ProjectPage project={current.project} showTitle={!detailCollapsed} />}
-          {current.kind === 'career' && current.career && <CareerPage entry={current.career} showTitle={!detailCollapsed} />}
-          {current.kind === 'education' && current.education && <EducationPage entry={current.education} showTitle={!detailCollapsed} />}
+          {current.kind === 'project' && current.project && <ProjectPage project={current.project} showTitle={!detailCollapsed} verticalOffset={detailOffset} />}
+          {current.kind === 'career' && current.career && <CareerPage entry={current.career} showTitle={!detailCollapsed} verticalOffset={detailOffset} />}
+          {current.kind === 'education' && current.education && <EducationPage entry={current.education} showTitle={!detailCollapsed} verticalOffset={detailOffset} />}
           {current.id === 'contact' && <ContactPage />}
         </motion.section>
       </AnimatePresence>

@@ -133,7 +133,6 @@ button { color: inherit; font: inherit; }
 .subtree button { position: relative; display: block; width: 100%; height: var(--child-row-height); padding: 5px 9px 5px 15px; color: var(--muted); font-size: .75rem; line-height: 15px; text-align: left; background: none; border: 0; cursor: pointer; transition: color .2s ease, transform .2s ease; }
 .subtree .nav-label-text { display: inline-block; max-width: 100%; overflow: visible; vertical-align: top; }
 .subtree .nav-label-copy { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.nav-label-space { display: block; visibility: hidden; max-width: 100%; overflow: hidden; white-space: nowrap; }
 .timeline-subtree button { padding-block: 4px; }
 .timeline-subtree .nav-label-text { display: block; }
 .timeline-subtree .nav-label-timeline { overflow: visible; text-overflow: clip; white-space: normal; }
