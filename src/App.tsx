@@ -595,6 +595,7 @@ export default function App() {
                           className={current.id === child.id ? 'active' : ''}
                           data-nav-key={child.id}
                           data-nav-page={child.id}
+                          title={child.label}
                           onClick={() => navigateTo(child.id)}
                           aria-current={current.id === child.id ? 'page' : undefined}
                         >
