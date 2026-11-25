@@ -446,7 +446,6 @@ export default function App() {
   const [detailCollapsed, setDetailCollapsed] = useState(false)
   const locked = useRef(false)
   const draggingBox = useRef(false)
-  const direction = useRef(1)
   const transitionTimers = useRef<number[]>([])
   const current = pages[active]
   const detailPage = ['project', 'career', 'education'].includes(current.kind)
@@ -455,7 +454,6 @@ export default function App() {
     const target = Math.max(0, Math.min(pages.length - 1, next))
     if (target === active || locked.current) return
     locked.current = true
-    direction.current = target > active ? 1 : -1
     setPreviewGroup(null)
     const fromDetail = ['project', 'career', 'education'].includes(pages[active].kind)
     const toDetail = ['project', 'career', 'education'].includes(pages[target].kind)
@@ -722,14 +720,14 @@ export default function App() {
         </svg>
       )}
 
-      <AnimatePresence mode="sync" initial={false}>
+      <AnimatePresence mode="wait" initial={false}>
         <motion.section
           key={current.id}
           className={`stage stage-${current.kind} ${current.id === 'projects' ? 'stage-projects' : ''}`}
-          initial={detailPage ? { opacity: 1, y: direction.current > 0 ? '100vh' : '-100vh' } : { opacity: 0, y: 36 }}
+          initial={{ opacity: 0, y: 36 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={detailPage ? { opacity: 1, y: direction.current > 0 ? '-100vh' : '100vh' } : { opacity: 0, y: -30 }}
-          transition={{ duration: detailPage ? .68 : .56, ease: [0.22, 1, 0.36, 1] }}
+          exit={{ opacity: 0, y: -30 }}
+          transition={{ duration: .56, ease: [0.22, 1, 0.36, 1] }}
           aria-live="polite"
         >
           {current.kind === 'home' && (
