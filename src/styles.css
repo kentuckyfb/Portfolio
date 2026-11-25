@@ -169,8 +169,10 @@ button { color: inherit; font: inherit; }
 .project-block h2 { margin: 0 0 18px; font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; }
 .stack-list { display: flex; flex-wrap: wrap; gap: 18px; margin: 0; padding: 0; list-style: none; }
 .stack-list li { display: grid; gap: 6px; justify-items: center; color: #5f5e58; font-size: .65rem; }
-.stack-list svg, .tech-fallback { width: 27px; height: 27px; fill: var(--ink); }
-.tech-fallback { display: grid; place-items: center; color: var(--ink); font-size: .62rem; font-weight: 800; text-transform: uppercase; }
+.stack-icon { display: grid; place-items: center; }
+.stack-icon svg, .stack-icon .tech-fallback { width: 27px; height: 27px; }
+.stack-icon svg { fill: currentColor; }
+.tech-fallback { display: grid; place-items: center; color: currentColor; font-size: .62rem; font-weight: 800; text-transform: uppercase; }
 
 .screenshots { grid-area: screenshots; align-self: start; min-height: 0; margin: 0; padding: 0; border: 0; }
 .screenshot-grid { display: flex; align-items: flex-start; gap: 12px; height: auto; }
@@ -230,7 +232,8 @@ button { color: inherit; font: inherit; }
 .tech-app { display: grid; gap: 4px; place-items: center; min-width: 0; text-align: center; }
 .tech-app-icon { display: grid; place-items: center; transition: transform .22s ease; }
 .tech-app:hover .tech-app-icon { transform: translateY(-3px) scale(1.08); }
-.tech-app-icon svg { width: 24px; height: 24px; fill: currentColor; }
+.tech-app-icon svg, .tech-app-icon .tech-fallback { width: 24px; height: 24px; }
+.tech-app-icon svg { fill: currentColor; }
 .tech-app > span { width: 100%; min-height: 2.2em; color: #686761; font-size: .56rem; line-height: 1.15; }
 
 @media (max-width: 720px) {
@@ -245,7 +248,7 @@ button { color: inherit; font: inherit; }
   .project-block h2 { margin-bottom: 9px; }
   .stack-list { gap: 10px; }
   .stack-list li > span:last-child { display: none; }
-  .stack-list svg, .tech-fallback { width: 22px; height: 22px; }
+  .stack-icon svg, .stack-icon .tech-fallback { width: 22px; height: 22px; }
   .screenshots { min-height: 0; }
   .screenshot-grid { gap: 8px; }
   .screenshot-grid div { width: min(260px, 68vw); }
@@ -267,7 +270,7 @@ button { color: inherit; font: inherit; }
   .tech-category { padding: 4px 2px 7px; }
   .tech-category h2 { margin-bottom: 10px; font-size: clamp(1.05rem, 4.2vw, 1.25rem); }
   .tech-grid { gap: 8px 2px; }
-  .tech-app-icon svg { width: 18px; height: 18px; }
+  .tech-app-icon svg, .tech-app-icon .tech-fallback { width: 18px; height: 18px; }
   .tech-app > span { min-height: 2em; font-size: .46rem; }
   .write-in { font-size: clamp(3.7rem, 18vw, 6rem); white-space: normal; }
 }

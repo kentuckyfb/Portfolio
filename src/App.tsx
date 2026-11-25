@@ -155,6 +155,10 @@ const techCategories: TechCategory[] = [
 
 const techLibrary = techCategories.flatMap(({ items }) => items)
 const techByName = new Map(techLibrary.map((tech) => [tech.name, tech]))
+const techColor = (name: string) => {
+  const tech = techByName.get(name)
+  return !tech?.icon || name === 'Unity' ? '#181817' : `#${tech.icon.hex}`
+}
 
 function BrandIcon({ icon }: { icon: SimpleIcon }) {
   return <svg viewBox="0 0 24 24" role="img" aria-hidden="true"><path d={icon.path} /></svg>
@@ -192,7 +196,7 @@ function ProjectPage({ project }: { project: Project }) {
         <ul className="stack-list">
           {project.stack.map((item) => (
             <li key={item} title={item}>
-              <TechMark name={item} />
+              <span className="stack-icon" style={{ color: techColor(item) }}><TechMark name={item} /></span>
               <span>{item}</span>
             </li>
           ))}
@@ -314,9 +318,9 @@ function ProjectsOverview() {
           <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
             <h2>{label}</h2>
             <div className="tech-grid">
-              {items.map(({ name, icon }) => (
+              {items.map(({ name }) => (
                 <div className="tech-app" key={name} title={name} aria-label={name}>
-                  <div className="tech-app-icon" style={{ color: !icon || name === 'Unity' ? '#181817' : `#${icon.hex}` }}><TechMark name={name} /></div>
+                  <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
                   <span>{name}</span>
                 </div>
               ))}
