@@ -1,5 +1,5 @@
 import { AnimatePresence, motion } from 'motion/react'
-import { useCallback, useEffect, useRef, useState, type FormEvent } from 'react'
+import { useCallback, useEffect, useRef, useState, type FormEvent, type PointerEvent as ReactPointerEvent } from 'react'
 import {
   siCss,
   siAxios,
@@ -331,7 +331,9 @@ function TechLibraryPage() {
 export default function App() {
   const [active, setActive] = useState(0)
   const [previewGroup, setPreviewGroup] = useState<string | null>(null)
+  const [hoveredNav, setHoveredNav] = useState<string | null>(null)
   const locked = useRef(false)
+  const draggingBox = useRef(false)
   const current = pages[active]
 
   const navigate = useCallback((next: number) => {
@@ -346,6 +348,8 @@ export default function App() {
   const navigateTo = (id: string) => navigate(pages.findIndex((page) => page.id === id))
 
   const moveActiveBox = (_event: MouseEvent | TouchEvent | PointerEvent, info: { point: { x: number; y: number } }) => {
+    draggingBox.current = false
+    setHoveredNav(null)
     const nav = document.querySelector<HTMLElement>('.explorer')
     if (!nav) return
 
@@ -369,17 +373,26 @@ export default function App() {
     if (target?.id && target.distance <= margin) navigateTo(target.id)
   }
 
-  const activeBox = (
-    <motion.span
-      className="nav-active-box"
-      layoutId="nav-active-box"
-      drag
-      dragMomentum={false}
-      dragSnapToOrigin
-      onDragEnd={moveActiveBox}
-      transition={{ type: 'spring', stiffness: 520, damping: 42 }}
-      aria-hidden="true"
-    />
+  const previewNav = (event: ReactPointerEvent<HTMLElement>) => {
+    if (draggingBox.current || event.pointerType === 'touch') return
+    const target = (event.target as HTMLElement).closest<HTMLElement>('[data-nav-key]')
+    setHoveredNav(target?.dataset.navKey ?? null)
+  }
+
+  const renderActiveBox = (key: string, level: 'home' | 'main' | 'child') => (
+    (hoveredNav ?? current.id) === key && (
+      <motion.span
+        className={`nav-active-box nav-active-box-${level}`}
+        layoutId="nav-active-box"
+        drag
+        dragMomentum={false}
+        dragSnapToOrigin
+        onDragStart={() => { draggingBox.current = true }}
+        onDragEnd={moveActiveBox}
+        transition={{ type: 'spring', stiffness: 480, damping: 38, mass: .72 }}
+        aria-hidden="true"
+      />
+    )
   )
 
   useEffect(() => {
@@ -414,20 +427,28 @@ export default function App() {
     <main className="canvas">
       <div className="paper-noise" aria-hidden="true" />
 
-      <nav className="explorer" aria-label="Portfolio navigation" data-scroll-region>
-        <button className="avatar-button" data-nav-page="home" onClick={() => navigate(0)} aria-label="Home">
+      <nav
+        className="explorer"
+        aria-label="Portfolio navigation"
+        data-scroll-region
+        onPointerMove={previewNav}
+        onPointerLeave={() => { if (!draggingBox.current) setHoveredNav(null) }}
+      >
+        <button className="avatar-button" data-nav-key="home" data-nav-page="home" onClick={() => navigate(0)} aria-label="Home">
           <img src={avatar} alt="" />
-          {current.id === 'home' && activeBox}
+          {renderActiveBox('home', 'home')}
         </button>
 
         <div className="tree-branches">
           {groups.map((group) => {
             const selected = current.group === group.id
             const open = previewGroup ? previewGroup === group.id : selected
+            const navKey = group.timeline ? `group-${group.id}` : group.id
             return (
               <div className={`branch ${selected ? 'selected' : ''}`} key={group.id}>
                 <button
                   className="branch-label"
+                  data-nav-key={navKey}
                   data-nav-page={group.timeline ? group.children?.[0]?.id : group.id}
                   onClick={() => group.timeline
                     ? setPreviewGroup((id) => id === group.id ? null : group.id)
@@ -436,7 +457,7 @@ export default function App() {
                   aria-expanded={group.timeline ? open : undefined}
                 >
                   {group.label}
-                  {current.id === group.id && activeBox}
+                  {renderActiveBox(navKey, 'main')}
                 </button>
 
                 <AnimatePresence initial={false}>
@@ -452,12 +473,13 @@ export default function App() {
                         <button
                           key={child.id}
                           className={current.id === child.id ? 'active' : ''}
+                          data-nav-key={child.id}
                           data-nav-page={child.id}
                           onClick={() => navigateTo(child.id)}
                           aria-current={current.id === child.id ? 'page' : undefined}
                         >
                           {child.label}
-                          {current.id === child.id && activeBox}
+                          {renderActiveBox(child.id, 'child')}
                         </button>
                       ))}
                     </motion.div>

@@ -40,7 +40,7 @@ button { color: inherit; font: inherit; }
   display: grid;
   width: 100vw;
   min-height: 100dvh;
-  overflow: hidden;
+  overflow: visible;
   isolation: isolate;
   background: var(--paper);
 }
@@ -95,16 +95,20 @@ button { color: inherit; font: inherit; }
   cursor: pointer;
 }
 
-.avatar-button img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.avatar-button img { display: block; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
 
 .nav-active-box {
   position: absolute;
   z-index: 3;
-  inset: -2px;
+  inset: -2px -4px;
   border: 1px solid var(--ink);
   cursor: grab;
   touch-action: none;
+  box-shadow: 0 3px 12px rgba(24, 24, 23, .06);
 }
+.nav-active-box::before { position: absolute; top: 50%; height: 1px; content: ''; background: var(--accent); pointer-events: none; }
+.nav-active-box-main::before { right: 100%; width: 12px; }
+.nav-active-box-child::before { left: 3px; width: 9px; }
 .nav-active-box:active { cursor: grabbing; }
 .avatar-button .nav-active-box { inset: 0; }
 
@@ -119,7 +123,6 @@ button { color: inherit; font: inherit; }
 .subtree button { position: relative; display: block; width: 100%; padding: 5px 9px 5px 15px; color: var(--muted); font-size: .75rem; text-align: left; background: none; border: 0; cursor: pointer; transition: color .2s ease, transform .2s ease; }
 .subtree button::before { position: absolute; top: 50%; left: 0; width: 9px; height: 1px; content: ''; background: var(--line); }
 .subtree button:hover, .subtree button.active { color: var(--ink); transform: translateX(2px); }
-.subtree button.active::before { background: var(--accent); }
 
 .stage { align-self: center; justify-self: center; width: min(900px, calc(100% - 48px)); padding-left: clamp(0px, 12vw, 180px); }
 .welcome { position: relative; display: inline-block; }
