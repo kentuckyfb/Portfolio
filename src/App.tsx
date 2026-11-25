@@ -199,6 +199,10 @@ const techCategories: TechCategory[] = [
 
 const techLibrary = techCategories.flatMap(({ items }) => items)
 const techByName = new Map(techLibrary.map((tech) => [tech.name, tech]))
+const TECH_TILE_WIDTH = 980
+const TECH_TILE_HEIGHT = 720
+const techTileCopies = [[0, 0], [1, 0], [0, 1], [1, 1], [0, 2], [1, 2]] as const
+const techPlaneItems = Array.from({ length: 126 }, (_, index) => techLibrary[index % techLibrary.length])
 const techColor = (name: string) => {
   const tech = techByName.get(name)
   return !tech?.icon || name === 'Unity' ? '#181817' : `#${tech.icon.hex}`
@@ -352,32 +356,37 @@ function ContactPage() {
 
 function ProjectsOverview() {
   const [grouped, setGrouped] = useState(true)
-  const [orbitRotation, setOrbitRotation] = useState(0)
-  const orbitDrag = useRef<{ pointerId: number; angle: number } | null>(null)
+  const planeOffset = useRef({ x: 0, y: 0 })
+  const planeTiles = useRef<(HTMLDivElement | null)[]>([])
+  const planeDrag = useRef<{ pointerId: number; x: number; y: number } | null>(null)
 
-  const pointerAngle = (event: ReactPointerEvent<HTMLDivElement>) => {
-    const bounds = event.currentTarget.getBoundingClientRect()
-    return Math.atan2(event.clientY - bounds.top - bounds.height / 2, event.clientX - bounds.left - bounds.width / 2) * 180 / Math.PI
+  const positionPlane = (x: number, y: number) => {
+    planeOffset.current = { x, y }
+    const wrappedX = ((x % TECH_TILE_WIDTH) + TECH_TILE_WIDTH) % TECH_TILE_WIDTH - TECH_TILE_WIDTH
+    const wrappedY = ((y % TECH_TILE_HEIGHT) + TECH_TILE_HEIGHT) % TECH_TILE_HEIGHT - TECH_TILE_HEIGHT
+    techTileCopies.forEach(([tileX, tileY], index) => {
+      const tile = planeTiles.current[index]
+      if (tile) tile.style.transform = `translate3d(${wrappedX + tileX * TECH_TILE_WIDTH}px, ${wrappedY + tileY * TECH_TILE_HEIGHT}px, 0)`
+    })
   }
 
-  const startOrbit = (event: ReactPointerEvent<HTMLDivElement>) => {
+  const startPlane = (event: ReactPointerEvent<HTMLDivElement>) => {
     event.currentTarget.setPointerCapture(event.pointerId)
-    orbitDrag.current = { pointerId: event.pointerId, angle: pointerAngle(event) }
+    planeDrag.current = { pointerId: event.pointerId, x: event.clientX, y: event.clientY }
   }
 
-  const rotateOrbit = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (orbitDrag.current?.pointerId !== event.pointerId) return
-    const angle = pointerAngle(event)
-    let delta = angle - orbitDrag.current.angle
-    if (delta > 180) delta -= 360
-    if (delta < -180) delta += 360
-    orbitDrag.current.angle = angle
-    setOrbitRotation((rotation) => rotation + delta)
+  const movePlane = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (planeDrag.current?.pointerId !== event.pointerId) return
+    const deltaX = event.clientX - planeDrag.current.x
+    const deltaY = event.clientY - planeDrag.current.y
+    planeDrag.current.x = event.clientX
+    planeDrag.current.y = event.clientY
+    positionPlane(planeOffset.current.x + deltaX, planeOffset.current.y + deltaY)
   }
 
-  const stopOrbit = (event: ReactPointerEvent<HTMLDivElement>) => {
-    if (orbitDrag.current?.pointerId !== event.pointerId) return
-    orbitDrag.current = null
+  const stopPlane = (event: ReactPointerEvent<HTMLDivElement>) => {
+    if (planeDrag.current?.pointerId !== event.pointerId) return
+    planeDrag.current = null
     if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId)
   }
 
@@ -407,16 +416,14 @@ function ProjectsOverview() {
           ))}
         </div>
       ) : (
-        <div className="tech-orbit" onPointerDown={startOrbit} onPointerMove={rotateOrbit} onPointerUp={stopOrbit} onPointerCancel={stopOrbit}>
-          {techLibrary.map(({ name }, index) => {
-            const ring = index % 5
-            const position = Math.floor(index / 5)
-            const angle = position * (360 / Math.ceil(techLibrary.length / 5)) + ring * 13 + orbitRotation
-            const radius = [72, 132, 194, 260, 336][ring]
-            return (
-              <div className="tech-orbit-icon" key={name} title={name} role="img" aria-label={name} style={{ color: techColor(name), transform: `rotate(${angle}deg) translateX(${radius}px) rotate(${-angle}deg)` }}><TechMark name={name} /></div>
-            )
-          })}
+        <div className="tech-plane" onPointerDown={startPlane} onPointerMove={movePlane} onPointerUp={stopPlane} onPointerCancel={stopPlane}>
+          {techTileCopies.map(([tileX, tileY], tileIndex) => (
+            <div className="tech-plane-tile" key={`${tileX}-${tileY}`} ref={(node) => { planeTiles.current[tileIndex] = node }} aria-hidden={tileX !== 1 || tileY !== 1} style={{ transform: `translate3d(${(tileX - 1) * TECH_TILE_WIDTH}px, ${(tileY - 1) * TECH_TILE_HEIGHT}px, 0)` }}>
+              {techPlaneItems.map(({ name }, index) => (
+                <div className="tech-plane-icon" key={`${name}-${index}`} title={name} role="img" aria-label={name} style={{ color: techColor(name) }}><TechMark name={name} /></div>
+              ))}
+            </div>
+          ))}
         </div>
       )}
     </article>

@@ -111,7 +111,7 @@ button { color: inherit; font: inherit; }
 }
 .nav-active-box:hover { border-color: var(--ink); }
 .nav-active-box:active { border-color: var(--ink); cursor: grabbing; }
-.avatar-button .nav-active-box { inset: 0; }
+.avatar-button .nav-active-box { inset: 0; border-radius: 50%; }
 
 .tree-branches { position: relative; margin: -1px 0 0 27px; padding-top: 12px; overflow: hidden; border-left: 1px solid var(--line); }
 .branch { position: relative; margin-left: 11px; width: calc(100% - 11px); }
@@ -243,15 +243,16 @@ button { color: inherit; font: inherit; }
 .tech-app-icon svg, .tech-app-icon .tech-fallback { width: 24px; height: 24px; }
 .tech-app-icon svg { fill: currentColor; }
 .tech-app > span { width: 100%; min-height: 2.2em; color: #686761; font-size: .56rem; line-height: 1.15; }
-.tech-orbit { position: relative; height: 100%; overflow: hidden; cursor: grab; touch-action: none; user-select: none; }
-.tech-orbit:active { cursor: grabbing; }
-.tech-orbit-icon { position: absolute; top: 50%; left: 50%; display: grid; width: 28px; height: 28px; margin: -14px; place-items: center; will-change: transform; animation: orbit-icon-in .55s cubic-bezier(.22, 1, .36, 1) both; }
-.tech-orbit-icon:nth-child(2n) { animation-delay: .03s; }
-.tech-orbit-icon:nth-child(3n) { animation-delay: .06s; }
-.tech-orbit-icon:nth-child(5n) { animation-delay: .1s; }
-.tech-orbit-icon svg, .tech-orbit-icon .tech-fallback { width: 27px; height: 27px; }
-.tech-orbit-icon svg { fill: currentColor; }
-@keyframes orbit-icon-in { from { opacity: 0; scale: .55; } }
+.tech-plane { position: relative; height: 100%; overflow: hidden; cursor: grab; touch-action: none; user-select: none; -webkit-mask-image: radial-gradient(ellipse 72% 64% at 50% 46%, #000 22%, rgba(0, 0, 0, .72) 56%, transparent 100%); mask-image: radial-gradient(ellipse 72% 64% at 50% 46%, #000 22%, rgba(0, 0, 0, .72) 56%, transparent 100%); }
+.tech-plane:active { cursor: grabbing; }
+.tech-plane-tile { position: absolute; top: 0; left: 0; display: grid; grid-template: repeat(9, 80px) / repeat(14, 70px); width: 980px; height: 720px; will-change: transform; }
+.tech-plane-icon { display: grid; place-items: center; animation: plane-icon-in .45s cubic-bezier(.22, 1, .36, 1) both; }
+.tech-plane-icon:nth-child(2n) { animation-delay: .025s; }
+.tech-plane-icon:nth-child(3n) { animation-delay: .05s; }
+.tech-plane-icon:nth-child(5n) { animation-delay: .075s; }
+.tech-plane-icon svg, .tech-plane-icon .tech-fallback { width: 27px; height: 27px; }
+.tech-plane-icon svg { fill: currentColor; }
+@keyframes plane-icon-in { from { opacity: 0; scale: .6; } }
 
 @media (max-width: 720px) {
   .explorer { top: 14px; left: 12px; width: calc(100vw - 24px); padding: 7px; background: rgba(246, 245, 239, .9); border: 1px solid var(--line); border-radius: 9px; backdrop-filter: blur(14px); }
@@ -292,8 +293,7 @@ button { color: inherit; font: inherit; }
   .tech-grid { gap: 8px 2px; }
   .tech-app-icon svg, .tech-app-icon .tech-fallback { width: 18px; height: 18px; }
   .tech-app > span { min-height: 2em; font-size: .46rem; }
-  .tech-orbit-icon { width: 21px; height: 21px; margin: -10.5px; }
-  .tech-orbit-icon svg, .tech-orbit-icon .tech-fallback { width: 20px; height: 20px; }
+  .tech-plane-icon svg, .tech-plane-icon .tech-fallback { width: 20px; height: 20px; }
   .write-in { font-size: clamp(3.7rem, 18vw, 6rem); white-space: normal; }
 }
 
