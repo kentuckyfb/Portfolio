@@ -198,6 +198,7 @@ const techCategories: TechCategory[] = [
 ]
 
 const techLibrary = techCategories.flatMap(({ items }) => items)
+const techDesktopColumns = Array.from({ length: 4 }, (_, index) => [techCategories[index], techCategories[index + 4]])
 const techByName = new Map(techLibrary.map((tech) => [tech.name, tech]))
 const techColor = (name: string) => {
   const tech = techByName.get(name)
@@ -391,18 +392,22 @@ function ProjectsOverview() {
         <div><h1>Projects</h1><p>Tech stacks I've used.</p></div>
       </header>
       <div className="tech-categories">
-        {techCategories.map(({ label, color, items }) => (
-          <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
-            <h2>{label}</h2>
-            <div className="tech-grid">
-              {items.map(({ name }) => (
-                <div className="tech-app" key={name} title={name} aria-label={name}>
-                  <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
-                  <span>{name}</span>
+        {techDesktopColumns.map((categories, column) => (
+          <div className="tech-category-column" key={column}>
+            {categories.map(({ label, color, items }) => (
+              <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
+                <h2>{label}</h2>
+                <div className="tech-grid">
+                  {items.map(({ name }) => (
+                    <div className="tech-app" key={name} title={name} aria-label={name}>
+                      <div className="tech-app-icon" style={{ color: techColor(name) }}><TechMark name={name} /></div>
+                      <span>{name}</span>
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
-          </section>
+              </section>
+            ))}
+          </div>
         ))}
       </div>
       <div className="tech-compact" onWheel={moveCategory}>
