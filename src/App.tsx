@@ -155,6 +155,16 @@ const techCategories: TechCategory[] = [
 
 const techLibrary = techCategories.flatMap(({ items }) => items)
 const techByName = new Map(techLibrary.map((tech) => [tech.name, tech]))
+const techScribbles = [
+  'M5 24 C58 13 151 33 234 22 C247 35 213 49 160 47 C94 44 35 46 11 62 C2 73 48 80 105 74 C165 67 219 79 233 91 C239 104 196 111 140 106 C78 101 31 112 14 124 C6 138 66 143 124 135 C179 128 219 140 234 151',
+  'M8 18 C41 34 88 37 129 22 C176 5 219 19 232 39 C243 58 195 61 154 52 C105 42 53 49 17 67 C-1 77 24 91 73 88 C129 84 190 72 226 94 C247 108 208 121 165 116 C115 110 61 108 20 132 C6 141 36 151 89 145 C143 139 198 135 232 153',
+  'M5 30 C54 11 102 42 151 23 C190 8 226 18 234 35 C242 52 207 62 169 54 C119 43 79 49 37 70 C12 82 18 94 54 96 C101 99 134 76 182 82 C223 86 241 101 224 114 C202 132 159 113 120 120 C76 128 35 143 8 133 C-2 145 38 157 89 148 C142 140 188 147 233 157',
+  'M7 20 C48 28 80 9 121 25 C164 41 210 19 234 33 C247 45 214 58 176 57 C128 55 97 39 54 54 C19 66 3 81 27 92 C54 105 94 80 137 91 C178 102 213 90 232 107 C245 120 216 133 174 126 C124 117 84 128 47 143 C29 151 15 148 7 139 C28 160 78 154 119 148 C169 140 204 151 234 158',
+  'M5 25 C34 5 80 15 109 36 C135 55 160 57 193 39 C216 27 236 32 233 50 C230 71 190 77 153 69 C108 59 72 53 35 72 C7 86 8 101 39 106 C78 112 116 87 155 95 C196 104 237 104 231 124 C226 142 182 140 145 133 C103 126 59 136 17 153',
+  'M9 16 C61 32 103 8 150 25 C191 40 220 32 232 48 C241 64 207 76 170 69 C127 62 88 45 48 61 C17 73 6 89 28 101 C55 116 95 91 133 99 C176 108 207 94 229 111 C247 125 215 143 170 135 C117 126 69 142 16 153',
+  'M4 32 C42 13 75 15 110 38 C144 60 178 48 213 25 C231 13 240 27 231 43 C218 65 176 72 139 61 C96 49 57 52 23 76 C4 90 12 104 46 109 C86 115 115 89 153 96 C194 103 226 96 234 116 C240 134 198 146 157 137 C112 127 64 135 14 154',
+  'M7 17 C38 38 72 35 103 17 C136 -2 170 12 190 35 C210 58 236 50 233 71 C230 91 195 96 159 83 C117 67 84 66 47 87 C18 104 8 118 34 129 C66 143 103 119 141 124 C180 130 210 118 232 137 C244 148 220 158 190 151 C141 140 91 146 17 158',
+]
 const techColor = (name: string) => {
   const tech = techByName.get(name)
   return !tech?.icon || name === 'Unity' ? '#181817' : `#${tech.icon.hex}`
@@ -314,8 +324,9 @@ function ProjectsOverview() {
         <p>Selected work and experiments.</p>
       </header>
       <div className="tech-categories">
-        {techCategories.map(({ label, color, items }) => (
+        {techCategories.map(({ label, color, items }, index) => (
           <section className="tech-category" key={label} style={{ '--category-color': color } as CSSProperties}>
+            <svg className="tech-scribble" viewBox="0 0 240 170" preserveAspectRatio="none" aria-hidden="true"><path d={techScribbles[index]} /></svg>
             <h2>{label}</h2>
             <div className="tech-grid">
               {items.map(({ name }) => (
